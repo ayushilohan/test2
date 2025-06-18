@@ -76,35 +76,45 @@ body {
 
 
 
-const items = document.querySelectorAll('.menu-item');
-const contentDisplay = document.getElementById('content-display');
-let currentFocus = 0;
+var currentFocus = 0;
+var totalItems = 2;
+var contentDisplay = document.getElementById('content-display');
 
-function loadPage(page) {
-  fetch(`pages/${page}`)
-    .then(res => res.text())
-    .then(html => {
+function loadPage(index) {
+  var page = '';
+  if (index === 0) page = 'home.html';
+  else if (index === 1) page = 'settings.html';
+
+  fetch('pages/' + page)
+    .then(function(res) {
+      return res.text();
+    })
+    .then(function(html) {
       contentDisplay.innerHTML = html;
     })
-    .catch(() => {
+    .catch(function() {
       contentDisplay.innerHTML = '<p>Error loading page.</p>';
     });
 }
 
 function updateFocus() {
-  items.forEach((item, index) => {
-    item.classList.toggle('focused', index === currentFocus);
-  });
-  const page = items[currentFocus].dataset.page;
-  loadPage(page);
+  for (var i = 0; i < totalItems; i++) {
+    var item = document.getElementById('menu-' + i);
+    if (i === currentFocus) {
+      item.classList.add('focused');
+    } else {
+      item.classList.remove('focused');
+    }
+  }
+  loadPage(currentFocus);
 }
 
-document.addEventListener('keydown', (e) => {
+document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowDown') {
-    currentFocus = (currentFocus + 1) % items.length;
+    currentFocus = (currentFocus + 1) % totalItems;
     updateFocus();
   } else if (e.key === 'ArrowUp') {
-    currentFocus = (currentFocus - 1 + items.length) % items.length;
+    currentFocus = (currentFocus - 1 + totalItems) % totalItems;
     updateFocus();
   }
 });

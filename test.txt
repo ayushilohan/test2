@@ -80,16 +80,23 @@ const items = document.querySelectorAll('.menu-item');
 const contentDisplay = document.getElementById('content-display');
 let currentFocus = 0;
 
-const contentMap = {
-  0: `<h2>🏠 Home</h2><p>Welcome to the home screen.</p>`,
-  1: `<h2>⚙️ Settings</h2><p>Adjust your preferences here.</p>`
-};
+function loadPage(page) {
+  fetch(`pages/${page}`)
+    .then(res => res.text())
+    .then(html => {
+      contentDisplay.innerHTML = html;
+    })
+    .catch(() => {
+      contentDisplay.innerHTML = '<p>Error loading page.</p>';
+    });
+}
 
 function updateFocus() {
   items.forEach((item, index) => {
     item.classList.toggle('focused', index === currentFocus);
   });
-  contentDisplay.innerHTML = contentMap[currentFocus];
+  const page = items[currentFocus].dataset.page;
+  loadPage(page);
 }
 
 document.addEventListener('keydown', (e) => {
@@ -102,4 +109,4 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-updateFocus(); // Initial render
+updateFocus(); // Load initial content

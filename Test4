@@ -1,0 +1,66 @@
+window.onload = function () {
+  var currentFocus = 0;
+  var totalItems = 2;
+  var pages = ['page-home', 'page-settings'];
+
+  function updateFocus() {
+    for (var i = 0; i < totalItems; i++) {
+      var item = document.getElementById('menu-' + i);
+      if (item) {
+        item.classList.toggle('focused', i === currentFocus);
+      }
+    }
+  }
+
+  function showPage(index) {
+    for (var i = 0; i < pages.length; i++) {
+      var page = document.getElementById(pages[i]);
+      if (page) {
+        page.classList.toggle('active', i === index);
+      }
+    }
+  }
+
+  function simulateKey(keyName) {
+    const event = new KeyboardEvent('keydown', {
+      key: keyName,
+      bubbles: true,
+      cancelable: true
+    });
+    document.dispatchEvent(event);
+  }
+
+  // Navigation using keyboard
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') {
+      currentFocus = (currentFocus + 1) % totalItems;
+      updateFocus();
+    } else if (e.key === 'ArrowUp') {
+      currentFocus = (currentFocus - 1 + totalItems) % totalItems;
+      updateFocus();
+    } else if (e.key === 'Enter') {
+      showPage(currentFocus);
+    }
+  });
+
+  // Virtual Remote Buttons
+  var keyMap = {
+    up: 'ArrowUp',
+    down: 'ArrowDown',
+    left: 'ArrowLeft',
+    right: 'ArrowRight',
+    ok: 'Enter'
+  };
+
+  for (var id in keyMap) {
+    var btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', function (e) {
+        simulateKey(keyMap[e.target.id]);
+      });
+    }
+  }
+
+  updateFocus();
+  showPage(0);
+};

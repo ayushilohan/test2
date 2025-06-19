@@ -1,66 +1,46 @@
-window.onload = function () {
-  var currentFocus = 0;
-  var totalItems = 2;
-  var pages = ['page-home', 'page-settings'];
+$(document).ready(function () {
+  const $sidebarBtns = [$('#menu1'), $('#menu2')];
+  const $remoteBtns = [$('#remote-up'), $('#remote-down')];
+
+  let currentSection = 'sidebar';
+  let sidebarIndex = 0;
+  let remoteIndex = 0;
 
   function updateFocus() {
-    for (var i = 0; i < totalItems; i++) {
-      var item = document.getElementById('menu-' + i);
-      if (item) {
-        item.classList.toggle('focused', i === currentFocus);
-      }
+    $('.selected').removeClass('selected');
+
+    if (currentSection === 'sidebar') {
+      $sidebarBtns[sidebarIndex].addClass('selected').focus();
+    } else {
+      $remoteBtns[remoteIndex].addClass('selected').focus();
     }
   }
 
-  function showPage(index) {
-    for (var i = 0; i < pages.length; i++) {
-      var page = document.getElementById(pages[i]);
-      if (page) {
-        page.classList.toggle('active', i === index);
+  $(document).on('keydown', function (e) {
+    if (currentSection === 'sidebar') {
+      if (e.key === 'ArrowRight') {
+        currentSection = 'remote';
+        updateFocus();
+      } else if (e.key === 'ArrowDown') {
+        sidebarIndex = (sidebarIndex + 1) % $sidebarBtns.length;
+        updateFocus();
+      } else if (e.key === 'ArrowUp') {
+        sidebarIndex = (sidebarIndex - 1 + $sidebarBtns.length) % $sidebarBtns.length;
+        updateFocus();
       }
-    }
-  }
-
-  function simulateKey(keyName) {
-    const event = new KeyboardEvent('keydown', {
-      key: keyName,
-      bubbles: true,
-      cancelable: true
-    });
-    document.dispatchEvent(event);
-  }
-
-  // Navigation using keyboard
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowDown') {
-      currentFocus = (currentFocus + 1) % totalItems;
-      updateFocus();
-    } else if (e.key === 'ArrowUp') {
-      currentFocus = (currentFocus - 1 + totalItems) % totalItems;
-      updateFocus();
-    } else if (e.key === 'Enter') {
-      showPage(currentFocus);
+    } else if (currentSection === 'remote') {
+      if (e.key === 'ArrowLeft') {
+        currentSection = 'sidebar';
+        updateFocus();
+      } else if (e.key === 'ArrowDown') {
+        remoteIndex = (remoteIndex + 1) % $remoteBtns.length;
+        updateFocus();
+      } else if (e.key === 'ArrowUp') {
+        remoteIndex = (remoteIndex - 1 + $remoteBtns.length) % $remoteBtns.length;
+        updateFocus();
+      }
     }
   });
 
-  // Virtual Remote Buttons
-  var keyMap = {
-    up: 'ArrowUp',
-    down: 'ArrowDown',
-    left: 'ArrowLeft',
-    right: 'ArrowRight',
-    ok: 'Enter'
-  };
-
-  for (var id in keyMap) {
-    var btn = document.getElementById(id);
-    if (btn) {
-      btn.addEventListener('click', function (e) {
-        simulateKey(keyMap[e.target.id]);
-      });
-    }
-  }
-
-  updateFocus();
-  showPage(0);
-};
+  updateFocus(); // Initial focus
+});

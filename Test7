@@ -1,0 +1,44 @@
+import React from 'react';
+
+const Sidebar = ({ setPage, currentPage }) => {
+  const buttons = [
+    { label: 'Page 1', id: 'page1' },
+    { label: 'Page 2', id: 'page2' },
+    { label: 'Page 3', id: 'page3' },
+    { label: 'Page 4', id: 'page4' },
+    { label: 'Page 5', id: 'page5' }
+  ];
+
+  return (
+    <div style={{ width: '20%', background: '#f0f0f0', padding: '10px' }}>
+      {buttons.map((btn) => (
+        <button
+          key={btn.id}
+          onClick={() => setPage(btn.id)}
+          style={{
+            display: 'block',
+            marginBottom: '10px',
+            backgroundColor: currentPage === btn.id ? '#a2d2ff' : '#ffffff',
+            border: '1px solid #ccc',
+            padding: '8px',
+            width: '100%',
+            cursor: 'pointer'
+          }}
+        >
+          {btn.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+export default Sidebar;
+
+
+
+
+
+
+
+
+<Sidebar setPage={setCurrentPage} currentPage={currentPage} />

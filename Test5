@@ -1,0 +1,65 @@
+import React, { useState } from 'react';
+import Sidebar from './components/Sidebar';
+import Page1 from './components/Page1';
+import Page2 from './components/Page2';
+import Page3 from './components/Page3';
+import Page4 from './components/Page4';
+import Page5 from './components/Page5';
+
+const App = () => {
+  const [currentPage, setCurrentPage] = useState('page1');
+
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'page1': return <Page1 />;
+      case 'page2': return <Page2 />;
+      case 'page3': return <Page3 />;
+      case 'page4': return <Page4 />;
+      case 'page5': return <Page5 />;
+      default: return <Page1 />;
+    }
+  };
+
+  return (
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <Sidebar setPage={setCurrentPage} />
+      <div style={{ flexGrow: 1, padding: '20px' }}>
+        {renderPage()}
+      </div>
+    </div>
+  );
+};
+
+export default App;
+
+
+
+
+
+
+
+
+import React from 'react';
+const Page1 = () => <div>This is Page 1</div>;
+export default Page1;
+
+
+
+
+
+
+import React from 'react';
+
+const Sidebar = ({ setPage }) => {
+  return (
+    <div style={{ width: '20%', background: '#f0f0f0', padding: '10px' }}>
+      <button onClick={() => setPage('page1')}>Page 1</button><br />
+      <button onClick={() => setPage('page2')}>Page 2</button><br />
+      <button onClick={() => setPage('page3')}>Page 3</button><br />
+      <button onClick={() => setPage('page4')}>Page 4</button><br />
+      <button onClick={() => setPage('page5')}>Page 5</button>
+    </div>
+  );
+};
+
+export default Sidebar;

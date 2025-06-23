@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 const Page1 = () => {
   const [input, setInput] = useState('');
@@ -16,16 +17,31 @@ const Page1 = () => {
     setItems(newItems);
   };
 
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post('https://your-api-endpoint.com/post', {
+        url: input,
+        vodnum: 'mp4',
+      });
+      console.log('POST Success:', response.data);
+      alert('Submitted successfully');
+    } catch (error) {
+      console.error('POST Error:', error);
+      alert('Submission failed');
+    }
+  };
+
   return (
     <div>
-      <h2>Todo List</h2>
+      <h2>Todo + Submit URL</h2>
       <input
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Enter item"
+        placeholder="Enter URL"
       />
       <button onClick={handleAdd}>Add</button>
+      <button onClick={handleSubmit}>Submit</button>
 
       <ul>
         {items.map((item, index) => (

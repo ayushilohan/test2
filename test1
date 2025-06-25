@@ -9,17 +9,26 @@ const buttonsList = {
 
 function App() {
   const [selectedGroup, setSelectedGroup] = useState('');
-  const [clickedButtons, setClickedButtons] = useState([]);
+  const [droppedItems, setDroppedItems] = useState([]);
 
   const handleRadioChange = (e) => {
     setSelectedGroup(e.target.value);
-    setClickedButtons([]); // optional: clear previous tags
+    setDroppedItems([]); // Optional: clear when radio changes
   };
 
-  const handleButtonClick = (label) => {
-    if (!clickedButtons.includes(label)) {
-      setClickedButtons(prev => [...prev, label]);
+  const onDragStart = (e, item) => {
+    e.dataTransfer.setData('text/plain', item);
+  };
+
+  const onDrop = (e) => {
+    const item = e.dataTransfer.getData('text/plain');
+    if (!droppedItems.includes(item)) {
+      setDroppedItems(prev => [...prev, item]);
     }
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault(); // Required to allow drop
   };
 
   return (
@@ -31,16 +40,22 @@ function App() {
         </div>
         <div className="button-list">
           {selectedGroup && buttonsList[selectedGroup].map(btn => (
-            <button key={btn} onClick={() => handleButtonClick(btn)}>{btn}</button>
+            <button
+              key={btn}
+              draggable
+              onDragStart={(e) => onDragStart(e, btn)}
+            >
+              {btn}
+            </button>
           ))}
         </div>
       </div>
 
       <div className="right-panel">
-        <div className="fixed-bottom">
-          {clickedButtons.length === 0 && <span className="placeholder">Click buttons to add tags</span>}
-          {clickedButtons.map(btn => (
-            <div key={btn} className="tag">{btn}</div>
+        <div className="fixed-bottom" onDrop={onDrop} onDragOver={onDragOver}>
+          {droppedItems.length === 0 && <span className="placeholder">Drag buttons here</span>}
+          {droppedItems.map((btn, i) => (
+            <div key={i} className="tag">{btn}</div>
           ))}
         </div>
       </div>
@@ -49,6 +64,7 @@ function App() {
 }
 
 export default App;
+
 
 
 
@@ -109,3 +125,4 @@ export default App;
   color: #999;
   font-size: 14px;
 }
+

@@ -29,3 +29,35 @@ app.post('/update-config', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
+
+
+
+
+const handleSubmit = (e) => {
+  e.preventDefault();
+
+  fetch("http://localhost:5000/update-config", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(formData),
+  })
+    .then(res => res.text())
+    .then(msg => alert(msg))
+    .catch(err => alert("Failed to upload config"));
+};
+
+
+
+
+function fetchFromServer() {
+  fetch("http://<YOUR_IP>:5000/config/feature-config.json")
+    .then(res => res.json())
+    .then(config => {
+      console.log("✅ Remote config:", config);
+      startPlayer(config.url);
+    })
+    .catch(err => console.error("❌ Failed to fetch remote JSON", err));
+}
+
+
+

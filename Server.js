@@ -49,15 +49,26 @@ const handleSubmit = (e) => {
 
 
 
-function fetchFromServer() {
-  fetch("http://<YOUR_IP>:5000/config/feature-config.json")
-    .then(res => res.json())
-    .then(config => {
-      console.log("✅ Remote config:", config);
-      startPlayer(config.url);
-    })
-    .catch(err => console.error("❌ Failed to fetch remote JSON", err));
-}
+var videoUrl = ""; // This will hold the value from JSON
+
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "http://<your-ip>:5000/config/feature-config.json", true);
+
+xhr.onreadystatechange = function () {
+  if (xhr.readyState === 4 && xhr.status === 200) {
+    var config = JSON.parse(xhr.responseText);
+    videoUrl = config.url; // 🎯 Store the URL from JSON
+    console.log("Video URL is: " + videoUrl);
+
+    // Optional: Start playing
+    var video = document.getElementById("videoPlayer");
+    video.src = videoUrl;
+    video.load();
+    video.play();
+  }
+};
+
+xhr.send();
 
 
 

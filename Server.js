@@ -62,3 +62,41 @@ xhr.onreadystatechange = function () {
     }
   }
 };
+
+
+
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "http://192.168.1.5:5000/config/feature-config.json", true); // ✅ Replace with your PC IP
+
+xhr.onreadystatechange = function () {
+  if (xhr.readyState === 4) {
+    console.log("📡 Status:", xhr.status);
+    console.log("📡 Response:", xhr.responseText);
+
+    if (xhr.status === 200 || xhr.status === 0) {
+      try {
+        var config = JSON.parse(xhr.responseText);
+        var videoUrl = config.url;
+        console.log("✅ Video URL:", videoUrl);
+
+        // Optional: play video
+        var video = document.getElementById("videoPlayer");
+        video.src = videoUrl;
+        video.load();
+        video.play();
+
+      } catch (e) {
+        console.error("❌ JSON Parse Error:", e);
+      }
+    } else {
+      console.error("❌ Request failed with status:", xhr.status);
+    }
+  }
+};
+
+xhr.onerror = function () {
+  console.error("❌ xhr.onerror triggered");
+};
+
+xhr.send();
+

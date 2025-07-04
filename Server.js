@@ -49,26 +49,16 @@ const handleSubmit = (e) => {
 
 
 
-var videoUrl = ""; // This will hold the value from JSON
-
-var xhr = new XMLHttpRequest();
-xhr.open("GET", "http://<your-ip>:5000/config/feature-config.json", true);
-
 xhr.onreadystatechange = function () {
-  if (xhr.readyState === 4 && xhr.status === 200) {
-    var config = JSON.parse(xhr.responseText);
-    videoUrl = config.url; // 🎯 Store the URL from JSON
-    console.log("Video URL is: " + videoUrl);
+  console.log("📡 ReadyState:", xhr.readyState, "Status:", xhr.status);
 
-    // Optional: Start playing
-    var video = document.getElementById("videoPlayer");
-    video.src = videoUrl;
-    video.load();
-    video.play();
+  if (xhr.readyState === 4) {
+    if (xhr.status === 200) {
+      var config = JSON.parse(xhr.responseText);
+      var videoUrl = config.url;
+      console.log("✅ Video URL:", videoUrl);
+    } else {
+      console.error("❌ Failed to fetch JSON. Status:", xhr.status);
+    }
   }
 };
-
-xhr.send();
-
-
-

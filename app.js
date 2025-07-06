@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import VirtualRemote from './VirtualRemote';
-import DropDelayDialog from './DropDelayDialog';
+import DialogBox from './DialogBox.js';
 
 const buttonsList = {
   HTV: ['HTV-A', 'HTV-B', 'HTV-C', 'HTV-D', 'HTV-E'],
@@ -11,96 +10,76 @@ const buttonsList = {
 function App() {
   const [selectedGroup, setSelectedGroup] = useState('');
   const [droppedItems, setDroppedItems] = useState([]);
-  const [activeRemoteTag, setActiveRemoteTag] = useState(null);
-  const [showDelayDialog, setShowDelayDialog] = useState(false);
-  const [pendingDropItem, setPendingDropItem] = useState(null);
-
-  const onDrop = (e) => {
-    const item = e.dataTransfer.getData('text/plain');
-  
-    if (droppedItems.includes(item)) return;
-  
-    if (droppedItems.length === 0) {
-      setDroppedItems(prev => [...prev, item]);
-    } else {
-      setPendingDropItem(item);
-      setShowDelayDialog(true);
-    }
-  };
-
-  const handleDelaySubmit = (delay) => {
-    if (pendingDropItem) {
-      // Here you could store the delay along with the item
-      setDroppedItems(prev => [...prev, pendingDropItem]);
-      console.log(`Delay for ${pendingDropItem}: ${delay} seconds`);
-      setPendingDropItem(null);
-      setShowDelayDialog(false);
-    }
-  };
-  
-  const handleDelayCancel = () => {
-    setPendingDropItem(null);
-    setShowDelayDialog(false);
-  };
-  
-  
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedButton, setSelectedButton] = useState('');
 
   const handleRadioChange = (e) => {
     setSelectedGroup(e.target.value);
-    setDroppedItems([]); // Optional: clear when radio changes
+    setDroppedItems([]);
+    setShowDialog(false);
   };
 
   const onDragStart = (e, item) => {
     e.dataTransfer.setData('text/plain', item);
   };
 
-  // const onDrop = (e) => {
-  //   const item = e.dataTransfer.getData('text/plain');
-  //   if (!droppedItems.includes(item)) {
-  //     setDroppedItems(prev => [...prev, item]);
-  //   }
-  // };
+  const onDrop = (e) => {
+    const item = e.dataTransfer.getData('text/plain');
+    if (!droppedItems.includes(item)) {
+      setDroppedItems(prev => [...prev, item]);
+    }
+  };
 
   const onDragOver = (e) => {
-    e.preventDefault(); // Required to allow drop
+    e.preventDefault();
+  };
+
+  const handleTagClick = (btn) => {
+    setSelectedButton(btn);
+    setShowDialog(true);
   };
 
   return (
     <div className="container">
+      {/* Left Panel */}
       <div className="left-panel">
         <div className="radio-buttons">
-          <label><input type="radio" value="HTV" name="group" onChange={handleRadioChange} /> HTV</label>
-          <label><input type="radio" value="SS" name="group" onChange={handleRadioChange} /> SS</label>
+          <label>
+            <input type="radio" value="HTV" name="group" onChange={handleRadioChange} />
+            HTV
+          </label>
+          <label>
+            <input type="radio" value="SS" name="group" onChange={handleRadioChange} />
+            SS
+          </label>
         </div>
         <div className="button-list">
-          {selectedGroup && buttonsList[selectedGroup].map(btn => (
-            <button
-              key={btn}
-              draggable
-              onDragStart={(e) => onDragStart(e, btn)}
-            >
-              {btn}
-            </button>
-          ))}
+          {selectedGroup &&
+            buttonsList[selectedGroup].map((btn) => (
+              <button key={btn} draggable onDragStart={(e) => onDragStart(e, btn)}>
+                {btn}
+              </button>
+            ))}
         </div>
       </div>
 
-      <div className="right-panel">
-        <div className="fixed-bottom" onDrop={onDrop} onDragOver={onDragOver}>
+      {/* Right Panel */}
+      <div className="right-panel" onDrop={onDrop} onDragOver={onDragOver}>
+        {showDialog && (
+          <div className="inline-dialog-container">
+            <DialogBox selectedButton={selectedButton} onClose={() => setShowDialog(false)} />
+          </div>
+        )}
+
+        <div className="fixed-bottom">
           {droppedItems.length === 0 && <span className="placeholder">Drag buttons here</span>}
           {droppedItems.map((btn, i) => (
-            <div key={i} className="tag">{btn}</div>
+            <div key={i} className="tag" onClick={() => handleTagClick(btn)}>
+              {btn}
+            </div>
           ))}
         </div>
       </div>
-
-      <VirtualRemote tag="KEY-A" />
-      <DropDelayDialog
-  open={showDelayDialog}
-  onSubmit={handleDelaySubmit}
-  onCancel={handleDelayCancel}
-/>
-
     </div>
   );
 }

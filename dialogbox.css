@@ -1,0 +1,128 @@
+.dialog-box {
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 16px;
+    padding: 18px 20px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    width: 100%;
+    max-width: 320px;
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border: 1px solid rgba(200, 200, 200, 0.3);
+    animation: fadeIn 0.2s ease-out;
+  }
+  
+  /* Close X */
+  .dialog-box .close-btn {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .dialog-box .close-btn:hover {
+    color: #000;
+  }
+  
+  /* Title */
+  .dialog-box h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #222;
+    padding-right: 24px;
+  }
+  
+  /* Input + Add button inline */
+  .dialog-inline-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .dialog-inline-row input[type="text"] {
+    flex: 1;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+  }
+  
+  .dialog-inline-row button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #007aff;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .dialog-inline-row button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Rest styling */
+  .radio-section label,
+  .checkbox-suboptions label,
+  .dropdown label {
+    font-size: 13px;
+    color: #444;
+  }
+  
+  .dialog-box select,
+  .dialog-box input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    outline: none;
+  }
+  
+  .dialog-box select:focus,
+  .dialog-box input:focus {
+    border-color: #4a90e2;
+  }
+  
+  .sub-options label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #444;
+  }
+  
+  .sub-options input {
+    padding: 7px;
+    border-radius: 8px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    margin-bottom: 8px;
+  }
+  
+  .save-btn {
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    border: none;
+    background: linear-gradient(to right, #4a90e2, #007aff);
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 6px;
+    width: 100%;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  

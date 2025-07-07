@@ -1,19 +1,17 @@
-window.onload = function () {
+window.onload = function() {
     try {
-        // Simulate display state manually
-        const stateString = "displayOn"; // or "standby", depending on your logic
+        const rp = webapis.remotepower;
+        const cur = rp.getPowerState();   // "NORMAL", "STANDBY", etc.
+        const t = Date.now();
+        localStorage.tvPowerState = cur;
+        localStorage.tvPowerTimestamp = t.toString();
+        console.log("Cur:", cur, "Prev:", localStorage.tvPowerState, "Δ:", t - parseInt(localStorage.tvPowerTimestamp));
 
-        // Store state
-        localStorage.setItem("tvState", stateString);
-        localStorage.setItem("tvStateTimestamp", Date.now());
-
-        // Read back
-        const storedState = localStorage.getItem("tvState");
-        const storedTime = new Date(parseInt(localStorage.getItem("tvStateTimestamp")));
-
-        console.log("Stored screen state:", storedState);
-        console.log("Timestamp:", storedTime.toString());
-    } catch (err) {
-        console.log("Error:", err.message);
+        if (localStorage.tvPowerState === "NORMAL" && cur === "STANDBY" && (t - parseInt(localStorage.tvPowerTimestamp)) < 60000) {
+            console.log("Detected possible power out event—waking screen.");
+            webapis.tv.power.setScreenState(true);
+        }
+    } catch (e) {
+        console.error("RemotePower error:", e.message);
     }
 };

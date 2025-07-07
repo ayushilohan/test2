@@ -15,3 +15,24 @@ window.onload = function() {
         console.error("RemotePower error:", e.message);
     }
 };
+
+
+let flag = 0;
+
+function init() {
+    flag = 0;
+    localStorage.setItem("appFlag", "0");
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") {
+            flag = 1;
+            localStorage.setItem("appFlag", "1");
+            console.log("Screen is visible");
+        } else {
+            flag = 2;
+            localStorage.setItem("appFlag", "2");
+            console.log("Screen is hidden or standby");
+        }
+    });
+}
+
+window.onload = init;

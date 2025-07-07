@@ -1,68 +1,26 @@
 window.onload = function () {
-    initApp();
-};
+    try {
+        tizen.systeminfo.getPropertyValue("DISPLAY", function(display) {
+            const isScreenOn = display.brightness > 0;
+            const stateString = isScreenOn ? "displayOn" : "standby";
 
-function initApp() {
-    console.log("App initialized");
+            // Save to localStorage
+            localStorage.setItem("tvState", stateString);
+            localStorage.setItem("tvStateTimestamp", Date.now());
 
-    const lastState = localStorage.getItem("tvState");
-    const lastTimestamp = parseInt(localStorage.getItem("tvStateTimestamp"));
-    const currentTime = Date.now();
-    const isRecent = lastTimestamp && (currentTime - lastTimestamp < 12 * 60 * 60 * 1000); // 12 hours
+            // Read back for logging
+            const storedState = localStorage.getItem("tvState");
+            const storedTime = new Date(parseInt(localStorage.getItem("tvStateTimestamp")));
 
-    const currentDisplayState = webapis.tv.power.getScreenState(); // true = display ON
-    console.log("Last saved state:", lastState);
-    console.log("Last saved time:", new Date(lastTimestamp).toString());
-    console.log("Current screen state:", currentDisplayState);
-
-    if (lastState === "displayOn" && !currentDisplayState && isRecent) {
-        console.log("Likely power cut. Forcing display ON...");
-        webapis.tv.power.setScreenState(true); // Force display ON
-        showEmergencyMessage();
+            // Log
+            console.log("Screen brightness:", display.brightness);
+            console.log("Current screen state:", stateString);
+            console.log("Stored state:", storedState);
+            console.log("Timestamp:", storedTime.toString());
+        }, function(error) {
+            console.log("Error reading screen info:", error.message);
+        });
+    } catch (err) {
+        console.log("Fatal error:", err.message);
     }
-
-    // Save current state and timestamp
-    const newState = currentDisplayState ? "displayOn" : "standby";
-    localStorage.setItem("tvState", newState);
-    localStorage.setItem("tvStateTimestamp", currentTime);
-}
-
-function showEmergencyMessage() {
-    const msgDiv = document.createElement("div");
-    msgDiv.innerText = "🚨 Emergency Alert: Please evacuate!";
-    msgDiv.style.position = "fixed";
-    msgDiv.style.top = "40%";
-    msgDiv.style.left = "10%";
-    msgDiv.style.color = "white";
-    msgDiv.style.fontSize = "48px";
-    msgDiv.style.background = "rgba(255, 0, 0, 0.8)";
-    msgDiv.style.padding = "20px";
-    msgDiv.style.zIndex = "9999";
-    msgDiv.style.borderRadius = "8px";
-    document.body.appendChild(msgDiv);
-}
-
-
-
-
-
-
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8" />
-    <title>TV Emergency Handler</title>
-</head>
-<body style="background:black;">
-    <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>
-    <script type="text/javascript" src="main.js"></script>
-</body>
-</html>
-
-
-
-
-
-
-<tizen:privilege name="http://developer.samsung.com/privilege/display"/>
-<tizen:privilege name="http://developer.samsung.com/privilege/tv.power"/>
+};

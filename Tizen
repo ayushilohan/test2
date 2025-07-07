@@ -1,38 +1,28 @@
-window.onload = function() {
-    try {
-        const rp = webapis.remotepower;
-        const cur = rp.getPowerState();   // "NORMAL", "STANDBY", etc.
-        const t = Date.now();
-        localStorage.tvPowerState = cur;
-        localStorage.tvPowerTimestamp = t.toString();
-        console.log("Cur:", cur, "Prev:", localStorage.tvPowerState, "Δ:", t - parseInt(localStorage.tvPowerTimestamp));
-
-        if (localStorage.tvPowerState === "NORMAL" && cur === "STANDBY" && (t - parseInt(localStorage.tvPowerTimestamp)) < 60000) {
-            console.log("Detected possible power out event—waking screen.");
-            webapis.tv.power.setScreenState(true);
-        }
-    } catch (e) {
-        console.error("RemotePower error:", e.message);
-    }
-};
-
-
 let flag = 0;
+const box = document.getElementById("statusBox");
 
 function init() {
-    flag = 0;
-    localStorage.setItem("appFlag", "0");
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible") {
-            flag = 1;
-            localStorage.setItem("appFlag", "1");
-            console.log("Screen is visible");
-        } else {
-            flag = 2;
-            localStorage.setItem("appFlag", "2");
-            console.log("Screen is hidden or standby");
-        }
-    });
+  flag = 0;
+  localStorage.setItem("appFlag", "0");
+  box.innerHTML = "🚀 App started (Flag = 0)";
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+      const prev = localStorage.getItem("appFlag");
+      flag = 2;
+      localStorage.setItem("appFlag", "2");
+      box.innerHTML = `📴 App went into standby<br>Previous Flag: ${prev} → Current Flag: 2`;
+    } else if (document.visibilityState === "visible") {
+      const prev = localStorage.getItem("appFlag");
+      flag = 1;
+      localStorage.setItem("appFlag", "1");
+      box.innerHTML = `📺 App is visible again<br>Previous Flag: ${prev} → Current Flag: 1`;
+
+      if (prev === "2") {
+        box.innerHTML += "<br>✅ Resumed from standby";
+      }
+    }
+  });
 }
 
 window.onload = init;

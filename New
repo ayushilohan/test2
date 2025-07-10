@@ -1,0 +1,61 @@
+//node
+// server.js or app.js
+const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+// POST endpoint to update JSON file
+app.post('/update-json', (req, res) => {
+    const newData = req.body;
+    const filePath = path.join(__dirname, 'public', 'data.json');
+
+    fs.writeFile(filePath, JSON.stringify(newData, null, 2), (err) => {
+        if (err) {
+            console.error("Error updating JSON:", err);
+            return res.status(500).send("Failed to write to JSON");
+        }
+        res.send("JSON updated successfully");
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
+
+
+
+//react
+function updateJsonFile() {
+  const updatedData = {
+    videoUrl: "https://example.com/updated.mp4"
+  };
+
+  fetch("http://localhost:3000/update-json", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(updatedData)
+  })
+    .then(response => response.text())
+    .then(data => console.log("Success:", data))
+    .catch(error => console.error("Error:", error));
+}
+
+
+//axios
+import axios from "axios";
+
+function updateJsonFile() {
+  const updatedData = {
+    videoUrl: "https://example.com/updated.mp4"
+  };
+
+  axios.post("http://localhost:3000/update-json", updatedData)
+    .then(res => console.log("Success:", res.data))
+    .catch(err => console.error("Error:", err));
+}

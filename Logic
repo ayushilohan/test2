@@ -1,0 +1,28 @@
+var featureConfig = {
+    feature: "videoPlay",
+    keyEvents: {
+        "50": "playVideo",
+        "51": "pauseVideo"
+    }
+};
+
+// Check if feature matches
+var currentFeature = "videoPlay"; // This can come dynamically too
+
+document.addEventListener("keydown", function(e) {
+    if (featureConfig.feature === currentFeature) {
+        var action = featureConfig.keyEvents[e.keyCode];
+        
+        if (action) {
+            if (action === "playVideo") {
+                playVideo(); // your custom function
+            } else if (action === "pauseVideo") {
+                pauseVideo(); // your custom function
+            } else {
+                console.log("Unhandled action:", action);
+            }
+        } else {
+            console.log("No action for keyCode:", e.keyCode);
+        }
+    }
+});

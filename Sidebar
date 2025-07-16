@@ -1,0 +1,85 @@
+// BurgerMenu.js
+import React, { useState, useEffect } from 'react';
+import './BurgerMenu.css';
+import axios from 'axios';
+
+const BurgerMenu = () => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [recents, setRecents] = useState([]);
+
+  useEffect(() => {
+    if (showMenu) {
+      axios.get('/api/recents') // your backend endpoint
+        .then(res => setRecents(res.data))
+        .catch(err => console.error('Error fetching recents:', err));
+    }
+  }, [showMenu]);
+
+  return (
+    <div className="burger-container" onMouseEnter={() => setShowMenu(true)} onMouseLeave={() => setShowMenu(false)}>
+      <div className="burger-icon">
+        &#9776; {/* Unicode for burger icon */}
+      </div>
+
+      {showMenu && (
+        <div className="menu-dropdown">
+          <h4>Recents</h4>
+          <ul>
+            {recents.length > 0 ? (
+              recents.map((item, index) => (
+                <li key={index}>{item.scenarioName}</li>
+              ))
+            ) : (
+              <li>No recent scenarios</li>
+            )}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default BurgerMenu;
+
+
+
+
+
+
+.burger-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.burger-icon {
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.menu-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  width: 200px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.menu-dropdown h4 {
+  margin: 0 0 10px;
+}
+
+.menu-dropdown ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-dropdown li {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}

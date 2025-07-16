@@ -1,6 +1,0 @@
-Application Behavior – Netflix Button Flow
-	1.	When the user clicks the Netflix button, the application checks whether the Netflix app is installed on the TV.
-	2.		•	If Netflix is already installed, it launches the app directly.
-	•	If Netflix is not installed, a dialog box appears prompting the user to initialize the token and proceed with the installation.
-	3.	After successful installation, the user can either launch Netflix from the dialog box or, in future sessions, by simply clicking the Netflix button.
-	4.	With this update, Netflix will be installed only once. Going forward, the application will detect its presence and launch it directly, without showing the dialog box again.

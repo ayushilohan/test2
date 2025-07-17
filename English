@@ -1,0 +1,1 @@
+Please set the display orientation of the signage to automatic and ensure the Tizen application’s auto-rotation is enabled. The device will automatically detect its orientation and display the application accordingly. If needed, you can use the provided API to set the rotation. After making these changes, restart the TV and verify the orientation functionality.

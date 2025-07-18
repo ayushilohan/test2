@@ -1,1 +1,27 @@
 Please set the display orientation of the signage to automatic and ensure the Tizen application’s auto-rotation is enabled. The device will automatically detect its orientation and display the application accordingly. If needed, you can use the provided API to set the rotation. After making these changes, restart the TV and verify the orientation functionality.
+
+
+
+
+1.	Declare all required variables.
+	2.	A function is written to check if the Netflix app is installed on the TV.
+It loops through all installed apps.
+	•	If Netflix is found, appFound is set to true.
+	•	Once the function finishes, netflixCheck is set to true.
+	3.	This function runs automatically when the application starts.
+	4.	By default, the Netflix icon is active on the screen.
+So if the user clicks on it:
+	•	The first condition checks if appFound is true (i.e., Netflix is installed).
+If yes, it launches Netflix using the launchApp() function.
+	5.	If appFound is false, it moves to the next condition.
+If netflixCheck is true (i.e., the check is completed), a dialog box appears.
+	6.	The dialog box handles three scenarios:
+	•	User only initializes the token and exits the app:
+The document becomes hidden. We reset the flag variable.
+When the document becomes visible again, the isNetflixInstalled() function runs again to check for installation.
+	•	User initializes, installs, and launches Netflix:
+Netflix is launched — same flow as before.
+	•	User initializes, installs, and exits the app:
+The document becomes hidden, flag is reset.
+When the document becomes visible again, the isNetflixInstalled() function runs again.
+Since Netflix is now installed (appFound = true), the app is launched directly using the Web API.

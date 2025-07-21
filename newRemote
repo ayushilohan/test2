@@ -1,0 +1,195 @@
+import React, { useState } from 'react';
+import './VirtualRemote.css';
+
+function VirtualRemote({ tag, onClose }) {
+  const [inputValue, setInputValue] = useState('');
+
+  if (!tag) return null;
+
+  const handleButtonClick = (value) => {
+    setInputValue(value);
+  };
+
+  return (
+    <div className="remote-container">
+      <div className="remote-header">
+        <span>{tag}</span>
+        <button onClick={onClose}>✖</button>
+      </div>
+
+      {/* Input box */}
+      <input
+        className="remote-input"
+        type="text"
+        value={inputValue}
+        readOnly
+        placeholder="Selected Button"
+      />
+
+      <div className="remote-body">
+        {/* Top Section */}
+        <div className="row">
+          <button className="btn power" onClick={() => handleButtonClick('Power')}>⏻</button>
+          <button className="btn" onClick={() => handleButtonClick('Source')}>SOURCE</button>
+        </div>
+
+        {/* Number pad */}
+        <div className="grid">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 0].map(num => (
+            <button key={num} className="btn" onClick={() => handleButtonClick(num)}>{num}</button>
+          ))}
+        </div>
+
+        {/* Volume / Channel Controls */}
+        <div className="row">
+          <button className="btn" onClick={() => handleButtonClick('VOL +')}>VOL +</button>
+          <button className="btn" onClick={() => handleButtonClick('CH +')}>CH +</button>
+        </div>
+        <div className="row">
+          <button className="btn" onClick={() => handleButtonClick('MUTE')}>MUTE</button>
+          <button className="btn" onClick={() => handleButtonClick('MEDIA')}>MEDIA</button>
+        </div>
+        <div className="row">
+          <button className="btn" onClick={() => handleButtonClick('VOL -')}>VOL -</button>
+          <button className="btn" onClick={() => handleButtonClick('CH -')}>CH -</button>
+        </div>
+
+        {/* Navigation */}
+        <div className="nav">
+          <button className="btn up" onClick={() => handleButtonClick('▲')}>▲</button>
+          <div className="mid-nav">
+            <button className="btn" onClick={() => handleButtonClick('◄')}>◄</button>
+            <button className="btn ok-btn" onClick={() => handleButtonClick('OK')}>OK</button>
+            <button className="btn" onClick={() => handleButtonClick('►')}>►</button>
+          </div>
+          <button className="btn down" onClick={() => handleButtonClick('▼')}>▼</button>
+        </div>
+
+        {/* Tools/Info/Color Buttons */}
+        <div className="row">
+          <button className="btn" onClick={() => handleButtonClick('TOOLS')}>TOOLS</button>
+          <button className="btn" onClick={() => handleButtonClick('INFO')}>INFO</button>
+        </div>
+        <div className="colors">
+          <button className="btn red" onClick={() => handleButtonClick('A')}>A</button>
+          <button className="btn green" onClick={() => handleButtonClick('B')}>B</button>
+          <button className="btn yellow" onClick={() => handleButtonClick('C')}>C</button>
+          <button className="btn blue" onClick={() => handleButtonClick('D')}>D</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default VirtualRemote;
+
+
+----------------------------------------------------------------------------------------
+
+.remote-container {
+  width: 220px;
+  background: #1b1b1b;
+  color: white;
+  padding: 10px;
+  border-radius: 15px;
+  position: fixed;
+  top: 15%;
+  left: 42%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  font-family: sans-serif;
+  font-size: 12px;
+}
+
+.remote-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.remote-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.remote-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.nav {
+  text-align: center;
+  margin-top: 6px;
+}
+
+.nav .mid-nav {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.colors {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.btn {
+  background: #333;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  padding: 6px 8px;
+  min-width: 50px;
+  cursor: pointer;
+  font-size: 12px;
+  text-align: center;
+}
+
+.btn.red { background-color: #e53935; }
+.btn.green { background-color: #43a047; }
+.btn.yellow { background-color: #fdd835; color: black; }
+.btn.blue { background-color: #1e88e5; }
+
+.btn.power {
+  background-color: #b71c1c;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background-color: #95be5f;
+}
+.ok-btn:hover {
+  background-color: #0a84ff;
+  color: white;
+}
+
+.remote-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  background: #f5f5f5;
+  color: #333;
+}

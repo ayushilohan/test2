@@ -1,4 +1,0 @@
-In version v6, the EnableUsageReporting option has been configured to auto-enable by default, and the acceptTermsOfService function is invoked accordingly. If a user manually unchecks the reporting option and exits the settings, the next time the settings screen is opened, the EnableUsageReporting method is automatically triggered, resulting in the option being re-enabled.
-
-
-In version 7, an Initialize and Launch button dialog box was implemented for the GC feature, intended for internal testing purposes. Previously, when the GC button was activated and clicked, it would directly open the GC page. With the new update, users are now prompted to enter a token, followed by initialization and launch of the application.

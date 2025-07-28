@@ -1,0 +1,52 @@
+var totalTime = 0;  
+var completedCalls = 0;  
+var totalApis = 5;  // tumhare 5 webapi calls  
+
+function measureWasApiTime(apiFunc, apiName) {
+    var startTime = performance.now();
+
+    try {
+        apiFunc(function success(result) {
+            var endTime = performance.now();
+            var timeTaken = endTime - startTime;
+            totalTime += timeTaken;
+            completedCalls++;
+
+            console.log(apiName + " Success in " + timeTaken.toFixed(2) + " ms");
+
+            checkIfAllDone();
+        }, function error(error) {
+            var endTime = performance.now();
+            var timeTaken = endTime - startTime;
+            totalTime += timeTaken;
+            completedCalls++;
+
+            console.log(apiName + " Failed in " + timeTaken.toFixed(2) + " ms");
+            console.log("Error: " + error.message);
+
+            checkIfAllDone();
+        });
+    } catch (e) {
+        console.log(apiName + " Exception: " + e.message);
+    }
+}
+
+function checkIfAllDone() {
+    if (completedCalls === totalApis) {
+        console.log("✅ Total Time Taken by all APIs: " + totalTime.toFixed(2) + " ms");
+    }
+}
+
+// Yahan apne 5 WebAPIs ke naam aur functions daalo
+var wasApis = [
+    { func: webapis.was.getProfileList, name: "getProfileList" },
+    { func: webapis.was.getStatus, name: "getStatus" },
+    { func: webapis.was.startMonitoring, name: "startMonitoring" },
+    { func: webapis.was.stopMonitoring, name: "stopMonitoring" },
+    { func: webapis.was.getServiceList, name: "getServiceList" }
+];
+
+// Har API ko call karo
+for (var i = 0; i < wasApis.length; i++) {
+    measureWasApiTime(wasApis[i].func, wasApis[i].name);
+}

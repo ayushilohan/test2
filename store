@@ -1,0 +1,54 @@
+import { configureStore, createSlice } from '@reduxjs/toolkit';
+
+// Create slice
+const remoteSlice = createSlice({
+  name: 'remote',
+  initialState: {
+    inputValue: ''
+  },
+  reducers: {
+    setInputValue: (state, action) => {
+      state.inputValue = action.payload;
+    }
+  }
+});
+
+// Export actions
+export const { setInputValue } = remoteSlice.actions;
+
+// Create store
+const store = configureStore({
+  reducer: {
+    remote: remoteSlice.reducer
+  }
+});
+
+export default store;
+
+
+---------------------------
+import React from 'react';
+import { Provider, useDispatch, useSelector } from 'react-redux';
+import store, { setInputValue } from './store';
+
+const RemoteInput = () => {
+  const dispatch = useDispatch();
+  const value = useSelector((state) => state.remote.inputValue);
+
+  return (
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => dispatch(setInputValue(e.target.value))}
+      placeholder="Enter something"
+    />
+  );
+};
+
+const App = () => (
+  <Provider store={store}>
+    <RemoteInput />
+  </Provider>
+);
+
+export default App;

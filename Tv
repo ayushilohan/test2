@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Cache Test App</title>
+    <title>Force Load No-Cache Test</title>
     <script>
-        // Force reload of script by adding a cache-busting query
-        var timestamp = new Date().getTime();
-        document.write('<script src="engine.js?v=' + timestamp + '"><\/script>');
+        window.onload = function() {
+            // Build script URL with force load & no cache
+            var timestamp = new Date().getTime(); 
+            document.write('<script type="text/javascript" src="engine.js?forceload=1&nocache=1&v=' + timestamp + '"><\/script>');
+        }
     </script>
 </head>
 <body>
-    <h1>Cache Testing on HAU8000</h1>
-    <div id="status">Loading engine...</div>
+    <h1>Force Load & No-Cache Test on HAU8000</h1>
+    <div id="engineStatus">Waiting for engine...</div>
 </body>
 </html>
 
 
 
-
-
-document.getElementById("status").innerText =
-    "Engine loaded successfully at " + new Date().toLocaleTimeString();
+document.getElementById("engineStatus").innerText =
+    "Engine loaded successfully (No-Cache) at " + new Date().toLocaleTimeString();

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cache Test App</title>
+    <script>
+        // Force reload of script by adding a cache-busting query
+        var timestamp = new Date().getTime();
+        document.write('<script src="engine.js?v=' + timestamp + '"><\/script>');
+    </script>
+</head>
+<body>
+    <h1>Cache Testing on HAU8000</h1>
+    <div id="status">Loading engine...</div>
+</body>
+</html>
+
+
+
+
+
+document.getElementById("status").innerText =
+    "Engine loaded successfully at " + new Date().toLocaleTimeString();

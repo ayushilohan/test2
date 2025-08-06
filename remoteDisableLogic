@@ -1,0 +1,81 @@
+import React, { useState } from 'react';
+import './VirtualRemote.css';
+
+function VirtualRemote({ tag, onClose }) {
+  const [inputValue, setInputValue] = useState('');
+  const [disabledButton, setDisabledButton] = useState(null); // track only one disabled
+
+  const handleButtonClick = (value) => {
+    setInputValue(value);
+    setDisabledButton(value); // disable only the last clicked
+  };
+
+  // check if current button is the disabled one
+  const isDisabled = (value) => disabledButton === value;
+
+  return (
+    <div className="remote-container">
+      <div className="remote-header">
+        <span>{tag}</span>
+        <button onClick={onClose}>✖</button>
+      </div>
+
+      {/* Input box */}
+      <input
+        className="remote-input"
+        type="text"
+        value={inputValue}
+        readOnly
+        placeholder="Selected Button"
+      />
+
+      <div className="remote-body">
+        {/* Example Buttons */}
+        <div className="row">
+          <button 
+            className={`btn ${isDisabled('Power') ? 'disabled-btn' : ''}`} 
+            disabled={isDisabled('Power')}
+            onClick={() => handleButtonClick('Power')}
+          >
+            ⏻
+          </button>
+          <button 
+            className={`btn ${isDisabled('Source') ? 'disabled-btn' : ''}`} 
+            disabled={isDisabled('Source')}
+            onClick={() => handleButtonClick('Source')}
+          >
+            SOURCE
+          </button>
+        </div>
+
+        {/* Number pad */}
+        <div className="grid">
+          {[1,2,3,4,5,6,7,8,9,0].map(num => (
+            <button 
+              key={num} 
+              className={`btn ${isDisabled(num) ? 'disabled-btn' : ''}`} 
+              disabled={isDisabled(num)}
+              onClick={() => handleButtonClick(num)}
+            >
+              {num}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default VirtualRemote;
+
+
+
+------------
+.btn.disabled-btn {
+  background-color: gray;   /* Change color for disabled */
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+

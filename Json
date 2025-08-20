@@ -1,0 +1,102 @@
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+
+// Async action to update backend
+export const updateJson = createAsyncThunk(
+  "json/updateJson",
+  async ({ formType, values }) => {
+    const res = await fetch("/api/update-json", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ formType, values }),
+    });
+    return await res.json();
+  }
+);
+
+const jsonSlice = createSlice({
+  name: "json",
+  initialState: { data: {}, status: "idle" },
+  reducers: {
+    // local merge before sending to backend
+    mergeLocalJson: (state, action) => {
+      const { formType, values } = action.payload;
+      state.data[formType] = {
+        ...state.data[formType],
+        ...values,
+      };
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(updateJson.fulfilled, (state, action) => {
+      state.data = action.payload.data; // backend returned updated JSON
+    });
+  },
+});
+
+export const { mergeLocalJson } = jsonSlice.actions;
+export default jsonSlice.reducer;
+
+
+
+
+
+
+
+
+import { useDispatch } from "react-redux";
+import { mergeLocalJson, updateJson } from "./jsonSlice";
+
+export default function FormA() {
+  const dispatch = useDispatch();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const values = { name: "Ayushi", exp: 2 };
+
+    // 1. update local state
+    dispatch(mergeLocalJson({ formType: "formA", values }));
+
+    // 2. send to backend
+    dispatch(updateJson({ formType: "formA", values }));
+  };
+
+  return <button onClick={handleSubmit}>Submit Form A</button>;
+}
+
+
+
+
+
+
+
+import { useDispatch } from "react-redux";
+import { mergeLocalJson, updateJson } from "./jsonSlice";
+
+export default function FormB() {
+  const dispatch = useDispatch();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const values = { location: "Delhi", desc: "Engineer" };
+
+    // 1. update local state
+    dispatch(mergeLocalJson({ formType: "formB", values }));
+
+    // 2. send to backend
+    dispatch(updateJson({ formType: "formB", values }));
+  };
+
+  return <button onClick={handleSubmit}>Submit Form B</button>;
+}
+
+
+
+
+
+
+
+// 
+{
+  "formA": { "name": "Ayushi", "exp": 2 },
+  "formB": { "location": "Delhi", "desc": "Engineer" }
+}

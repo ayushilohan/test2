@@ -1,0 +1,80 @@
+import React, { useState } from "react";
+
+const RemoteApp = () => {
+  const [fields, setFields] = useState(["", "", "", ""]); // 4 input fields
+  const [disabledButtons, setDisabledButtons] = useState([]); // track disabled buttons
+  const [selectedIndex, setSelectedIndex] = useState(null); // active input
+  const [flashMsg, setFlashMsg] = useState(""); // flash message
+
+  const handleInputFocus = (index) => {
+    setSelectedIndex(index);
+  };
+
+  const handleButtonClick = (value) => {
+    if (selectedIndex === null) {
+      showFlashMessage("⚠️ Select an input field!");
+      return;
+    }
+
+    const updatedFields = [...fields];
+    const prevValue = updatedFields[selectedIndex]; // old button value (if any)
+
+    // update selected field with new value
+    updatedFields[selectedIndex] = value;
+    setFields(updatedFields);
+
+    // disable new button
+    setDisabledButtons((prev) => [...prev, value]);
+
+    // re-enable old button if different
+    if (prevValue && prevValue !== value) {
+      setDisabledButtons((prev) => prev.filter((btn) => btn !== prevValue));
+    }
+  };
+
+  const showFlashMessage = (msg) => {
+    setFlashMsg(msg);
+    setTimeout(() => {
+      setFlashMsg("");
+    }, 2000); // disappear after 2 sec
+  };
+
+  return (
+    <div>
+      {/* Input fields */}
+      {fields.map((val, index) => (
+        <input key={index} value={val} onFocus={() => handleInputFocus(index)} readOnly
+          style={{ margin: "5px", padding: "8px", border: selectedIndex === index ? "2px solid #007bff" : "1px solid #ccc", borderRadius: "6px", outline: "none" }}
+        />
+      ))}
+
+      <div style={{ marginTop: "20px" }}>
+        {/* Remote buttons */}
+        {["A", "B", "C", "D"].map((btn) => (
+          <button key={btn} onClick={() => handleButtonClick(btn)} disabled={disabledButtons.includes(btn)} style={{ margin: "5px" }} > {btn} </button>
+        ))}
+      </div>
+
+      {/* Flash (toast) message */}
+      {flashMsg && (
+        <div style={{ position: "fixed", top: "20px", right: "20px", background: "#ffcccc", color: "#b30000", padding: "8px 15px", borderRadius: "8px", fontSize: "14px", boxShadow: "0px 2px 8px rgba(0,0,0,0.2)", animation: "fadeInOut 2s forwards", }} >
+          {flashMsg}
+        </div>
+      )}
+
+      {/* CSS Animation */}
+      <style>
+        {`
+          @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+          }
+        `}
+      </style>
+    </div>
+  );
+};
+
+export default RemoteApp;

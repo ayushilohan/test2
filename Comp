@@ -1,0 +1,45 @@
+import { useState } from "react";
+import Component1 from "./Component1";
+import Component2 from "./Component2";
+
+export default function Parent() {
+  const [active, setActive] = useState(null); // track which component is active
+  const [dialogState, setDialogState] = useState({
+    comp1: null,
+    comp2: null,
+  });
+
+  const handleDialogClose = (compName) => {
+    setDialogState((prev) => ({
+      ...prev,
+      [compName]: null, // reset only when X clicked
+    }));
+  };
+
+  return (
+    <div>
+      <button onClick={() => setActive("comp1")}>Button 1</button>
+      <button onClick={() => setActive("comp2")}>Button 2</button>
+
+      {active === "comp1" && (
+        <Component1
+          dialogData={dialogState.comp1}
+          setDialogData={(data) =>
+            setDialogState((prev) => ({ ...prev, comp1: data }))
+          }
+          onClose={() => handleDialogClose("comp1")}
+        />
+      )}
+
+      {active === "comp2" && (
+        <Component2
+          dialogData={dialogState.comp2}
+          setDialogData={(data) =>
+            setDialogState((prev) => ({ ...prev, comp2: data }))
+          }
+          onClose={() => handleDialogClose("comp2")}
+        />
+      )}
+    </div>
+  );
+}

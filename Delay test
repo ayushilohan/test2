@@ -1,0 +1,103 @@
+import React, { useState } from "react";
+
+function DragDropDemo() {
+  const [droppedItems, setDroppedItems] = useState([]);
+  const [dialogs, setDialogs] = useState([]); // store multiple dialogs
+
+  const handleDrop = (buttonType) => {
+    if (buttonType === "button1") {
+      // Directly add with input box
+      setDroppedItems((prev) => [
+        ...prev,
+        { id: Date.now(), type: "button1", value: "" }
+      ]);
+    } else if (buttonType === "button2") {
+      // Instead of opening 1 dialog, store multiple
+      const newDialog = { id: Date.now(), type: "button2", value: "" };
+      setDialogs((prev) => [...prev, newDialog]);
+    }
+  };
+
+  const handleDialogChange = (id, value) => {
+    setDialogs((prev) =>
+      prev.map((dlg) => (dlg.id === id ? { ...dlg, value } : dlg))
+    );
+  };
+
+  const handleDialogSubmit = (dialog) => {
+    // Move dialog data into droppedItems
+    setDroppedItems((prev) => [...prev, dialog]);
+    setDialogs((prev) => prev.filter((dlg) => dlg.id !== dialog.id));
+  };
+
+  return (
+    <div>
+      {/* Buttons to drag (simulated with click) */}
+      <button onClick={() => handleDrop("button1")}>Button 1</button>
+      <button onClick={() => handleDrop("button2")}>Button 2</button>
+
+      {/* Fixed bottom container */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: 0,
+          width: "100%",
+          border: "1px solid black",
+          padding: "10px",
+          background: "#f9f9f9",
+        }}
+      >
+        {droppedItems.map((item) => (
+          <div
+            key={item.id}
+            style={{ margin: "8px", padding: "6px", border: "1px solid gray" }}
+          >
+            <p>{item.type}</p>
+            {item.type === "button1" ? (
+              <input
+                type="text"
+                placeholder="Enter value"
+                value={item.value}
+                onChange={(e) => {
+                  setDroppedItems((prev) =>
+                    prev.map((it) =>
+                      it.id === item.id ? { ...it, value: e.target.value } : it
+                    )
+                  );
+                }}
+              />
+            ) : (
+              <p>Time: {item.value}</p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Multiple dialogs for button2 */}
+      {dialogs.map((dialog) => (
+        <div
+          key={dialog.id}
+          style={{
+            position: "fixed",
+            top: "30%",
+            left: "40%",
+            background: "white",
+            border: "1px solid black",
+            padding: "20px",
+            marginBottom: "10px",
+          }}
+        >
+          <h4>Enter Time for Button 2</h4>
+          <input
+            type="text"
+            value={dialog.value}
+            onChange={(e) => handleDialogChange(dialog.id, e.target.value)}
+          />
+          <button onClick={() => handleDialogSubmit(dialog)}>Submit</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default DragDropDemo;

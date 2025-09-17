@@ -1,0 +1,125 @@
+// app.js
+import React, { useState, useEffect } from "react";
+import "./App.css";
+
+const videos = Array.from({ length: 10 }, (_, i) => `Video ${i + 1}`);
+
+export default function App() {
+  const [activeIndex, setActiveIndex] = useState(0); // Start from Video 4
+
+  // const handleKeyDown = (e) => {
+  //   if (e.key === "ArrowRight" && activeIndex < videos.length - 1) {
+  //     setActiveIndex((prev) => prev + 1);
+  //   }
+  //   if (e.key === "ArrowLeft" && activeIndex > 0) {
+  //     setActiveIndex((prev) => prev - 1);
+  //   }
+  // };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "ArrowRight") {
+      // Loop from the last video (index 9) to the first (index 0)
+      setActiveIndex((prev) => (prev + 1) % videos.length);
+    }
+    if (e.key === "ArrowLeft") {
+      // Loop from the first video (index 0) to the last (index 9)
+      setActiveIndex((prev) => (prev - 1 + videos.length) % videos.length);
+    }
+  };
+  
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeIndex]);
+
+  return (
+    <div className="container">
+      {videos.map((video, index) => {
+        const distance = Math.abs(index - activeIndex);
+
+        if (distance > 3) return null; // only show 3 left & right
+
+        let className = "video";
+        if (index === activeIndex) {
+          className += " active";
+        } else {
+          className += ` level-${distance}`;
+        }
+
+        return (
+          <div key={index} className={className}>
+            {video}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+
+
+
+
+
+
+// app.css
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end; /* 👈 keep bottom aligned */
+  height: calc(100vh - 60px); /* 👈 Subtracts 60px from the viewport height */
+  background: #03023b;
+  overflow: hidden;
+  gap: 12px;
+  padding-bottom: 60px;
+}
+
+
+.video {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  border-radius: 8px;
+  /* transition: all 0.5s ease;  👈 smooth animation */
+  transition: all 0.5s cubic-bezier(0.25, 0.08, 0.25, 0.97);
+  font-size: 16px;
+  margin: 0 60px;
+}
+
+/* Active div */
+.active {
+  width: 260px;
+  height: 530px;
+  background: white;
+  color: black;
+  font-weight: bold;
+  z-index: 3;
+  transform: scale(1.05);
+}
+
+/* Levels for slope effect */
+.level-1 {
+  width: 160px;
+  height: 240px;
+  background: #8b8b8b;
+  opacity: 1; /* 👈 Fully opaque */
+  z-index: 2;
+  margin: 0 -30px; /* 👈 Negative margin to pull it closer */
+}
+.level-2 {
+  width: 130px;
+  height: 190px;
+  background: #484848;
+  opacity: 1; /* 👈 Fully opaque */
+  z-index: 1;
+  margin: 0 -30px; /* 👈 Negative margin to pull it closer */
+}
+.level-3 {
+  width: 100px;
+  height: 150px;
+  background: #343434;
+  opacity: 1; /* 👈 Fully opaque */
+  z-index: 0;
+  margin: 0 -30px; /* 👈 Negative margin to pull it closer */
+}

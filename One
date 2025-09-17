@@ -11,14 +11,24 @@ const videos = [
 export default function App() {
   const [currentIndex, setCurrentIndex] = useState(1);
 
-  // Handle remote key events
+  // Handle keyboard arrow keys
   useEffect(() => {
     const handleKey = (e) => {
-      if (e.keyCode === 37) { // Left Arrow
+      // For now using normal ArrowLeft / ArrowRight
+      if (e.key === "ArrowLeft") {
         setCurrentIndex((prev) => Math.max(prev - 1, 0));
-      } else if (e.keyCode === 39) { // Right Arrow
+      } else if (e.key === "ArrowRight") {
         setCurrentIndex((prev) => Math.min(prev + 1, videos.length - 1));
       }
+
+      // 🔒 Tizen remote keys (commented for now)
+      /*
+      if (e.keyCode === 37) { // Left Arrow on Tizen
+        setCurrentIndex((prev) => Math.max(prev - 1, 0));
+      } else if (e.keyCode === 39) { // Right Arrow on Tizen
+        setCurrentIndex((prev) => Math.min(prev + 1, videos.length - 1));
+      }
+      */
     };
 
     window.addEventListener("keydown", handleKey);

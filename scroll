@@ -1,0 +1,51 @@
+import React, { useRef, useEffect } from "react";
+
+function App() {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!containerRef.current) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        containerRef.current.scrollTo({
+          top: containerRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }
+
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        containerRef.current.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      style={{
+        height: "400px",
+        overflowY: "auto",
+        border: "1px solid black",
+        backgroundColor: "red"
+      }}
+    >
+      <button style={{ height: "300px", width: "100%" }}>Top Button</button>
+
+      {/* Space between buttons */}
+      <div style={{ height: "60px" }}></div>
+
+      <button style={{ height: "300px", width: "100%" }}>Bottom Button</button>
+    </div>
+  );
+}
+
+export default App;

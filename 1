@@ -1,0 +1,59 @@
+import React, { useState } from "react";
+
+export default function FixedBottom() {
+  const [items, setItems] = useState(["Button 1", "Button 2", "Button 3"]);
+
+  const handleDragStart = (e, index) => {
+    e.dataTransfer.setData("dragIndex", index);
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    const dragIndex = e.dataTransfer.getData("dragIndex");
+    if (dragIndex === null) return;
+
+    const newItems = [...items];
+    const [draggedItem] = newItems.splice(dragIndex, 1);
+    newItems.splice(dropIndex, 0, draggedItem);
+
+    setItems(newItems);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // allow drop
+  };
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: 0,
+        right: 0,
+        width: "300px",
+        background: "#f1f1f1",
+        padding: "10px",
+        borderTop: "1px solid #ccc",
+        display: "flex",
+        gap: "10px",
+      }}
+    >
+      {items.map((item, index) => (
+        <div
+          key={index}
+          draggable
+          onDragStart={(e) => handleDragStart(e, index)}
+          onDrop={(e) => handleDrop(e, index)}
+          onDragOver={handleDragOver}
+          style={{
+            padding: "8px 12px",
+            background: "white",
+            border: "1px solid #999",
+            borderRadius: "5px",
+            cursor: "grab",
+          }}
+        >
+          {item}
+        </div>
+      ))}
+    </div>
+  );
+}

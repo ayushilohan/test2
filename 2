@@ -1,0 +1,24 @@
+tizen.application.launchAppControl(
+    new tizen.ApplicationControl(
+        "http://tizen.org/appcontrol/operation/view",
+        null, null, null,
+        [ new tizen.ApplicationControlData("page", ["second.html"]) ] // param bhejna
+    ),
+    "org.example.receiver",   // Receiver App ID
+    function() { console.log("Receiver launched with param"); },
+    function(err) { console.error("Error: " + err.message); }
+);
+
+
+
+// rece
+tizen.application.getCurrentApplication().getRequestedAppControl(function(appControl) {
+    if (appControl && appControl.appControl.data.length > 0) {
+        var data = appControl.appControl.data[0];
+        if (data.key === "page") {
+            var pageName = data.value[0];
+            console.log("Navigate to: " + pageName);
+            window.location.href = pageName; // second.html open kar do
+        }
+    }
+});

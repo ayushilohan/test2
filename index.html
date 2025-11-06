@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tizen Debug Console</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Tizen WebSocket Debug</h2>
+    <input id="url" placeholder="ws://192.168.x.x:7011/devtools/page/1" />
+    <button onclick="connect()">Connect</button>
+    <input id="cmd" placeholder="Enter JS command (e.g., alert('Hi'))" />
+    <button onclick="sendCmd()">Send Command</button>
+    <pre id="logs"></pre>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>

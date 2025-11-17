@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tizen Tool</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Tizen Build & Deploy Tool</h1>
+
+    <div class="form-group">
+      <label>Workspace Path</label>
+      <input id="workspacePath" type="text">
+    </div>
+
+    <div class="form-group">
+      <label>Certificate Name</label>
+      <input id="certificateName" type="text">
+    </div>
+
+    <div class="form-group">
+      <label>Project App ID</label>
+      <input id="appId" type="text">
+    </div>
+
+    <div class="form-group">
+      <label>TV IP:Port</label>
+      <input id="tvIpPort" type="text">
+    </div>
+
+    <div class="buttons">
+      <button onclick="buildWeb()">Build</button>
+      <button onclick="buildPackage()">Package</button>
+      <button onclick="sdbPush()">SDB Push</button>
+      <button onclick="installApp()">Install</button>
+      <button onclick="uninstallApp()">Uninstall</button>
+      <button onclick="runPython()">Run Debug File</button>
+      <button id="inspectBtn" disabled onclick="inspectURL()">Inspect</button>
+    </div>
+
+    <div id="debugUrlBox" class="debug-box">Debug URL: <span id="debugUrlText"></span></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Debug Tool</title>
+</head>
+<body>
+<h2>Python Debug Runner</h2>
+<button onclick="getData()">Get Port & URL</button>
+<p id="o"></p>
+<script>
+async function getData(){
+ let r=await fetch('result.json');
+ let d=await r.json();
+ document.getElementById('o').innerText='Port: '+d.port+' URL: '+d.url;
+}
+</script>
+</body>
+</html>

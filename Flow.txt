@@ -1,0 +1,48 @@
+Here you go — clear, medium-detailed, point-wise summary:
+
+⸻
+
+📄 Point-Wise Summary
+	1.	User enters basic details on the UI
+	•	WGT file path
+	•	WGT name
+	•	App ID
+	•	TV IP address
+	2.	UI provides buttons for all Tizen actions
+	•	Build
+	•	Package
+	•	Push
+	•	Install
+	•	Uninstall
+	•	Run in Debug Mode
+	3.	When a button is clicked, the UI sends the input to the backend
+Each action calls a specific backend API like /build, /install, /run-debug, etc.
+	4.	Backend receives the data and runs the actual Tizen CMD commands
+It uses Node.js to execute commands such as:
+	•	tizen build-web
+	•	tizen package
+	•	sdb push
+	•	tizen install
+	•	tizen uninstall
+	•	tizen run --debug
+	5.	Backend collects and processes the command output
+	•	Checks if the command succeeded
+	•	Captures logs
+	•	Handles errors
+	6.	For debug mode, backend extracts important details
+	•	Finds the debug port number in the command output
+	•	Creates the final Chrome inspector URL
+	7.	Backend sends the result back to the UI
+	•	Success / failure message
+	•	Logs
+	•	Port number (for debug)
+	•	Inspector URL
+	8.	UI displays the final output to the user
+	•	Shows success messages for each action
+	•	Shows clickable Chrome inspector link for debugging
+	9.	End result:
+The entire Tizen build → package → install → debug workflow happens through UI clicks, with no need to open CMD at any stage.
+
+⸻
+
+If you want, I can format it into a clean PDF or DOCX too.

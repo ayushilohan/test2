@@ -1,0 +1,24 @@
+const WebSocket = require("ws");
+const { exec } = require("child_process");
+
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on("connection", (ws) => {
+
+  ws.on("message", (msg) => {
+    if (msg.toString() === "RUN_FETCH_FILE") {
+
+      exec("node fetchUrl.js", (err, stdout, stderr) => {
+        if (err) {
+          ws.send("ERROR");
+          return;
+        }
+        ws.send(stdout.trim());
+      });
+
+    }
+  });
+
+});
+
+console.log("WebSocket server running on 8080");

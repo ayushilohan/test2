@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<button id="runBtn">Run Fetch URL</button>
+<p id="output"></p>
+
+<script>
+  // connect once, stays connected
+  const ws = new WebSocket("ws://localhost:8080");
+
+  ws.onopen = () => {
+    console.log("WebSocket connected");
+  };
+
+  ws.onmessage = (event) => {
+    document.getElementById("output").innerText = event.data;
+  };
+
+  ws.onerror = (err) => {
+    console.error("WebSocket error", err);
+  };
+
+  // button click → tell server to run fetch file
+  document.getElementById("runBtn").onclick = () => {
+    ws.send("RUN_FETCH_FILE");
+  };
+</script>
+
+</body>
+</html>

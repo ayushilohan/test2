@@ -1,0 +1,82 @@
+// ---- STATE ----
+var intervalId = null;
+var lastMute = null;
+var lastVolume = null;
+var CHECK_TIME = 500; // 0.5s polling
+var STABLE_LIMIT = 6; // after 6 cycles (3 sec) stop
+var stableCount = 0;
+
+
+// ---- START WATCHER ----
+function startWatcher() {
+    if (intervalId !== null) { return; } // prevent duplicate intervals
+
+    intervalId = setInterval(function () {
+
+        var mute = tizen.tvaudiocontrol.isMute();
+        var vol = tizen.tvaudiocontrol.getVolume();
+
+        // Detect mute change
+        if (mute !== lastMute) {
+            lastMute = mute;
+            stableCount = 0;
+            console.log("Mute changed: " + mute);
+        }
+
+        // Detect volume change
+        if (vol !== lastVolume) {
+            lastVolume = vol;
+            stableCount = 0;
+            console.log("Volume changed: " + vol);
+        }
+
+        // If nothing changed → increase counter
+        if (mute === lastMute && vol === lastVolume) {
+            stableCount++;
+        }
+
+        // Auto-stop when stable for long enough
+        if (stableCount >= STABLE_LIMIT) {
+            stopWatcher();
+        }
+
+    }, CHECK_TIME);
+}
+
+
+// ---- STOP WATCHER ----
+function stopWatcher() {
+    if (intervalId === null) { return; }
+    clearInterval(intervalId);
+    intervalId = null;
+    stableCount = 0;
+    console.log("⛔ Stopped watcher");
+}
+
+
+// ---- VOLUME LISTENER ----
+function initAudio() {
+    // Initial fetch
+    try {
+        lastVolume = tizen.tvaudiocontrol.getVolume();
+        lastMute = tizen.tvaudiocontrol.isMute();
+        console.log("Init Volume: " + lastVolume + "  Mute: " + lastMute);
+    } catch (e) {
+        console.log("Init error: " + e.message);
+    }
+
+    // Volume button listener — this exists
+    try {
+        tizen.tvaudiocontrol.setVolumeChangeListener(function (vol) {
+            lastVolume = vol;
+            console.log("Vol listener: " + vol);
+            startWatcher(); // begin mute polling
+        });
+    } catch(e) {
+        console.log("Listener setup error: " + e.message);
+    }
+}
+
+
+// ---- RUN ON LOAD ----
+initAudio();

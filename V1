@@ -1,0 +1,24 @@
+let lastMuteState = null;
+let lastVolume = null;
+
+// start checks immediately
+setInterval(() => {
+  const muted = tizen.tvaudiocontrol.isMute();
+  const vol = tizen.tvaudiocontrol.getVolume();
+
+  if (muted !== lastMuteState) {
+    lastMuteState = muted;
+    console.log("Mute state changed:", muted);
+  }
+
+  if (vol !== lastVolume) {
+    lastVolume = vol;
+    console.log("Volume changed:", vol);
+  }
+}, 500); // runs every 0.5 sec
+
+// listener only updates volume state (no interval creation)
+tizen.tvaudiocontrol.setVolumeChangeListener((vol) => {
+  lastVolume = vol;
+  console.log("Listener volume:", vol);
+});

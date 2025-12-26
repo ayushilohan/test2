@@ -1,0 +1,69 @@
+// ---- state variables ----
+var intervalId = null;
+var lastMute = null;
+var lastVolume = null;
+var CHECK_TIME = 500; // ms
+
+// ---- watcher start ----
+function startWatcher() {
+    if (intervalId !== null) { return; } // avoid duplicate runs
+
+    intervalId = setInterval(function () {
+        var mute = tizen.tvaudiocontrol.isMute();
+        var vol = tizen.tvaudiocontrol.getVolume();
+
+        // detect mute changes
+        if (lastMute !== mute) {
+            lastMute = mute;
+            console.log("Mute changed: " + mute);
+        }
+
+        // detect volume changes
+        if (lastVolume !== vol) {
+            lastVolume = vol;
+            console.log("Volume changed: " + vol);
+        }
+
+        // AUTO-STOP: if both are unchanged (stable)
+        if (lastMute === mute && lastVolume === vol) {
+            stopWatcher();
+        }
+    }, CHECK_TIME);
+}
+
+// ---- watcher stop ----
+function stopWatcher() {
+    if (intervalId === null) { return; }
+    clearInterval(intervalId);
+    intervalId = null;
+    console.log("Stopped watcher");
+}
+
+// ---- listeners ----
+function initAudioListeners() {
+    try {
+        // volume
+        tizen.tvaudiocontrol.setVolumeChangeListener(function (vol) {
+            lastVolume = vol;
+            console.log("Volume listener: " + vol);
+            startWatcher();
+        });
+
+        // mute
+        tizen.tvaudiocontrol.setMuteStateChangeListener(function (mute) {
+            lastMute = mute;
+            console.log("Mute listener: " + mute);
+            startWatcher();
+        });
+
+        // initialize baseline state on load
+        lastVolume = tizen.tvaudiocontrol.getVolume();
+        lastMute = tizen.tvaudiocontrol.isMute();
+        console.log("Init state -> Volume: " + lastVolume + "  Mute: " + lastMute);
+    } catch (e) {
+        console.log("Audio listener error: " + e.message);
+    }
+}
+
+// ---- call this on app load ----
+initAudioListeners();

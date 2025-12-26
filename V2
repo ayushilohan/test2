@@ -34,3 +34,10 @@ function stopWatcher() {
   intervalId = null;
   console.log("⛔ Stopped watcher");
 }
+
+
+tizen.tvaudiocontrol.setVolumeChangeListener((vol) => {
+  console.log("Volume changed:", vol);
+  lastVolume = vol;
+  startWatcher(); // interval starts only now
+});

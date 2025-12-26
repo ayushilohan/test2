@@ -1,0 +1,36 @@
+let intervalId = null;
+let lastMute = null;
+let lastVolume = null;
+
+function startWatcher() {
+  if (intervalId) return; // prevent duplicates
+
+  intervalId = setInterval(() => {
+    const muted = tizen.tvaudiocontrol.isMute();
+    const volume = tizen.tvaudiocontrol.getVolume();
+
+    // detect mute change
+    if (muted !== lastMute) {
+      lastMute = muted;
+      console.log("Mute:", muted);
+    }
+
+    // detect volume change
+    if (volume !== lastVolume) {
+      lastVolume = volume;
+      console.log("Volume:", volume);
+    }
+
+    // 🧠 Auto-stop interval if nothing changed for 3 seconds
+    if (muted === lastMute && volume === lastVolume) {
+      stopWatcher();
+    }
+  }, 500);
+}
+
+function stopWatcher() {
+  if (!intervalId) return;
+  clearInterval(intervalId);
+  intervalId = null;
+  console.log("⛔ Stopped watcher");
+}

@@ -1,0 +1,179 @@
+import { useState, useEffect } from "react";
+
+export default function ShortsLayout() {
+  const videos = [
+    "https://www.w3schools.com/html/mov_bbb.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    "https://www.w3schools.com/html/movie.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/bee.mp4",
+    "https://www.w3schools.com/html/mov_bbb.mp4",
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(2);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowFocused, setIsFollowFocused] = useState(false);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "ArrowRight" && currentIndex < videos.length - 1)
+        setCurrentIndex((p) => p + 1);
+
+      if (e.key === "ArrowLeft" && currentIndex > 0)
+        setCurrentIndex((p) => p - 1);
+
+      if (e.key === "ArrowUp") setIsFollowFocused(true);
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [currentIndex]);
+
+  // reset follow + focus on video change
+  useEffect(() => {
+    setIsFollowing(false);
+    setIsFollowFocused(false);
+  }, [currentIndex]);
+
+  const prev = videos.slice(Math.max(0, currentIndex - 3), currentIndex);
+  const next = videos.slice(currentIndex + 1, currentIndex + 4);
+
+  const sectionBox = {
+    margin: "8px",
+    borderRadius: "16px",
+    border: "1px solid #ccc",
+    overflow: "hidden",
+  };
+
+  const cardStyle = (index) => ({
+    position: "absolute",
+    bottom: "8px",
+    left: `${index * 14}px`,
+    width: "80%",
+    height: `${140 - index * 35}px`,
+    opacity: 1 - index * 0.3,
+    background: "#ccc",
+    borderRadius: "12px",
+    border: "1px solid #aaa",
+    zIndex: 10 - index,
+  });
+
+  const actionBtnStyle = {
+    width: "44px",
+    height: "44px",
+    borderRadius: "50%",
+    border: "none",
+    background: "rgba(0,0,0,0.6)",
+    color: "#fff",
+    fontSize: "18px",
+    cursor: "pointer",
+  };
+
+  const navBtnStyle = {
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    border: "none",
+    background: "rgba(0,0,0,0.6)",
+    color: "#fff",
+    fontSize: "16px",
+    cursor: "pointer",
+  };
+
+  return (
+    <div style={{ height: "100vh", display: "flex", padding: "8px" }}>
+      {/* LEFT COLUMN */}
+      <div style={{ width: "33.33%", display: "flex", flexDirection: "column" }}>
+        <div style={{ ...sectionBox, height: "60%", padding: "10px", display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px", background: "#f5f5f5", padding: "8px", borderRadius: "14px" }}>
+            <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#ccc" }} />
+            <b>@demo_user</b>
+            <button
+              onClick={() => setIsFollowing(true)}
+              style={{ marginLeft: "auto", borderRadius: "12px", border: "none", padding: "4px 10px" }}
+            >
+              Follow
+            </button>
+          </div>
+
+          <div style={{ background: "#fafafa", padding: "8px", borderRadius: "12px", fontSize: "14px" }}>
+            Demo Shorts description section.
+          </div>
+
+          <div style={{ flex: 1, background: "#fff", borderRadius: "12px", padding: "8px", fontSize: "13px", overflowY: "auto" }}>
+            <div><b>User1:</b> Nice 🔥</div>
+            <div><b>User2:</b> Awesome</div>
+            <div><b>User3:</b> Watching 👀</div>
+            <div><b>User4:</b> Love it ❤️</div>
+          </div>
+        </div>
+
+        <div style={{ ...sectionBox, height: "40%", position: "relative" }}>
+          {prev.map((_, i) => <div key={i} style={cardStyle(i)} />)}
+        </div>
+      </div>
+
+      {/* CENTER COLUMN */}
+      <div style={{ width: "33.33%", ...sectionBox, position: "relative" }}>
+        <video
+          key={videos[currentIndex]}
+          src={videos[currentIndex]}
+          autoPlay
+          muted
+          playsInline
+          controls={false}
+          disablePictureInPicture
+          controlsList="nofullscreen noremoteplayback nodownload"
+          onEnded={() => currentIndex < videos.length - 1 && setCurrentIndex((p) => p + 1)}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+        />
+
+        {/* TOP LEFT FOLLOW */}
+        <div style={{ position: "absolute", top: "12px", left: "12px", display: "flex", alignItems: "center", gap: "10px", background: "rgba(0,0,0,0.5)", padding: "8px 12px", borderRadius: "20px", color: "#fff" }}>
+          <div style={{ width: "32px", height: "32px", borderRadius: "50%", background: "#ddd" }} />
+          <span>@demo_user</span>
+          <button
+            onClick={() => {
+              if (isFollowFocused) {
+                setIsFollowing(true);
+                setIsFollowFocused(false);
+              }
+            }}
+            style={{
+              padding: "4px 10px",
+              borderRadius: "12px",
+              border: isFollowFocused ? "2px solid yellow" : "none",
+              background: isFollowFocused ? "#ffd700" : "#fff",
+              cursor: "pointer",
+            }}
+          >
+            Follow
+          </button>
+        </div>
+
+        {/* RIGHT ACTIONS */}
+        <div style={{ position: "absolute", right: "12px", bottom: "60px", display: "flex", flexDirection: "column", gap: "14px" }}>
+          <button style={actionBtnStyle}>👍</button>
+          <button style={actionBtnStyle}>👎</button>
+          <button style={actionBtnStyle}>💬</button>
+        </div>
+
+        {/* BOTTOM CENTER NAV */}
+        <div style={{ position: "absolute", bottom: "16px", left: "50%", transform: "translateX(-50%)", display: "flex", gap: "12px" }}>
+          <button style={navBtnStyle} onClick={() => currentIndex > 0 && setCurrentIndex((p) => p - 1)}>◀</button>
+          <button style={navBtnStyle} onClick={() => currentIndex < videos.length - 1 && setCurrentIndex((p) => p + 1)}>▶</button>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN */}
+      <div style={{ width: "33.33%", display: "flex", flexDirection: "column" }}>
+        <div style={{ ...sectionBox, height: "60%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "18px", fontWeight: "bold" }}>
+          {isFollowing ? "Following" : ""}
+        </div>
+
+        <div style={{ ...sectionBox, height: "40%", position: "relative" }}>
+          {next.map((_, i) => <div key={i} style={cardStyle(i)} />)}
+        </div>
+      </div>
+    </div>
+  );
+}

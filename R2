@@ -1,0 +1,249 @@
+import { useState, useEffect } from "react";
+
+export default function ShortsLayout() {
+  const videos = [
+    "https://www.w3schools.com/html/mov_bbb.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    "https://www.w3schools.com/html/movie.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/bee.mp4",
+    "https://www.w3schools.com/html/mov_bbb.mp4",
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(2);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowFocused, setIsFollowFocused] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [blink, setBlink] = useState(true);
+
+  /* POPUP EVERY 5 SECONDS */
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setShowPopup(true);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  /* BLINK EFFECT */
+  useEffect(() => {
+    if (!showPopup || isFollowing) return;
+
+    const blinkTimer = setInterval(() => {
+      setBlink((b) => !b);
+    }, 700);
+
+    return () => clearInterval(blinkTimer);
+  }, [showPopup, isFollowing]);
+
+  /* KEY HANDLING */
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key === "ArrowRight" && currentIndex < videos.length - 1) {
+        setCurrentIndex((p) => p + 1);
+      }
+
+      if (e.key === "ArrowLeft" && currentIndex > 0) {
+        setCurrentIndex((p) => p - 1);
+      }
+
+      if (e.key === "ArrowUp") {
+        setIsFollowFocused(true);
+      }
+
+      if (e.key === "Enter" && isFollowFocused) {
+        setIsFollowing(true);
+        setIsFollowFocused(false);
+        setShowPopup(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [currentIndex, isFollowFocused]);
+
+  /* RESET ON VIDEO CHANGE */
+  useEffect(() => {
+    setIsFollowing(false);
+    setIsFollowFocused(false);
+    setShowPopup(false);
+  }, [currentIndex]);
+
+  const prev = videos.slice(Math.max(0, currentIndex - 3), currentIndex);
+  const next = videos.slice(currentIndex + 1, currentIndex + 4);
+
+  const cardStyle = (index) => ({
+    position: "absolute",
+    width: `${90 - index * 10}%`,
+    height: `${80 - index * 15}px`,
+    bottom: "0",
+    left: "5%",
+    opacity: 1 - index * 0.3,
+    background: "#aaa",
+    borderRadius: "10px",
+    border: "1px solid #666",
+  });
+
+  const sectionStyle = {
+    margin: "8px",
+    borderRadius: "12px",
+    border: "1px solid #ccc",
+  };
+
+  return (
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        overflow: "hidden",
+        background: "#f5f5f5",
+      }}
+    >
+      {/* LEFT COLUMN */}
+      <div style={{ width: "33.33%", display: "flex", flexDirection: "column" }}>
+        <div style={{ ...sectionStyle, height: "60%", padding: "8px" }}>
+          <strong>👤 @creator</strong>
+          <button style={{ marginTop: "6px" }}>Follow</button>
+
+          <div style={{ marginTop: "12px" }}>
+            <strong>Description</strong>
+            <p>Sample short video description.</p>
+          </div>
+
+          <div style={{ marginTop: "12px" }}>
+            <strong>Live Chat</strong>
+            <div>👤 User1: Hi</div>
+            <div>👤 User2: Nice 🔥</div>
+          </div>
+        </div>
+
+        <div style={{ ...sectionStyle, height: "40%", position: "relative" }}>
+          {prev.map((_, i) => (
+            <div key={i} style={cardStyle(i)} />
+          ))}
+        </div>
+      </div>
+
+      {/* CENTER COLUMN */}
+      <div style={{ width: "33.33%", position: "relative", ...sectionStyle }}>
+        {/* USER + FOLLOW */}
+        <div style={{ position: "absolute", top: "12px", left: "12px", zIndex: 3 }}>
+          <strong>👤 @creator</strong>
+
+          <button
+            onClick={() => {
+              if (isFollowFocused) {
+                setIsFollowing(true);
+                setIsFollowFocused(false);
+                setShowPopup(false);
+              }
+            }}
+            style={{
+              marginTop: "6px",
+              padding: "6px 14px",
+              borderRadius: "16px",
+              border: isFollowFocused ? "2px solid gold" : "1px solid #333",
+              background: isFollowFocused ? "#ffe066" : "#fff",
+              boxShadow: isFollowFocused ? "0 0 12px gold" : "none",
+            }}
+          >
+            Follow
+          </button>
+
+          {isFollowFocused && (
+            <div style={{ fontSize: "12px" }}>⬆ Press Enter to Follow</div>
+          )}
+        </div>
+
+        {/* BLINKING POPUP (RIGHT UPPER) */}
+        {showPopup && !isFollowing && (
+          <div
+            style={{
+              position: "absolute",
+              top: "12px",
+              right: "12px",
+              padding: "12px 14px",
+              background: "rgba(0,0,0,0.85)",
+              color: "#fff",
+              borderRadius: "10px",
+              zIndex: 5,
+              opacity: blink ? 1 : 0.4,
+              transition: "opacity 0.3s",
+              fontSize: "13px",
+              textAlign: "center",
+            }}
+          >
+            📸 Join on Instagram <br />
+            <small>Click Follow</small>
+          </div>
+        )}
+
+        {/* VIDEO */}
+        <video
+          key={videos[currentIndex]}
+          src={videos[currentIndex]}
+          autoPlay
+          controls={false}
+          onEnded={() => {
+            if (currentIndex < videos.length - 1) {
+              setCurrentIndex((p) => p + 1);
+            }
+          }}
+          style={{ width: "100%", height: "100%", borderRadius: "12px" }}
+        />
+
+        {/* ACTION BUTTONS */}
+        <div
+          style={{
+            position: "absolute",
+            right: "12px",
+            bottom: "80px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+          }}
+        >
+          <button>👍</button>
+          <button>👎</button>
+          <button>💬</button>
+        </div>
+
+        {/* NAVIGATION */}
+        <div
+          style={{
+            position: "absolute",
+            bottom: "12px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            gap: "12px",
+          }}
+        >
+          <button
+            disabled={currentIndex === 0}
+            onClick={() => setCurrentIndex((p) => p - 1)}
+          >
+            ◀
+          </button>
+          <button
+            disabled={currentIndex === videos.length - 1}
+            onClick={() => setCurrentIndex((p) => p + 1)}
+          >
+            ▶
+          </button>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN */}
+      <div style={{ width: "33.33%", display: "flex", flexDirection: "column" }}>
+        <div style={{ ...sectionStyle, height: "60%", padding: "8px" }}>
+          {isFollowing && <strong>✅ Following</strong>}
+        </div>
+
+        <div style={{ ...sectionStyle, height: "40%", position: "relative" }}>
+          {next.map((_, i) => (
+            <div key={i} style={cardStyle(i)} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

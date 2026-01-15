@@ -1,0 +1,217 @@
+import { useState, useEffect, useRef } from "react";
+
+export default function ShortsLayout() {
+  const videos = [
+    "https://www.w3schools.com/html/mov_bbb.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    "https://www.w3schools.com/html/movie.mp4",
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/bee.mp4",
+    "https://www.w3schools.com/html/mov_bbb.mp4",
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(2);
+  const [focus, setFocus] = useState(null); // leftArrow | rightArrow | follow | like
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(300);
+  const [showHeartAnim, setShowHeartAnim] = useState(false);
+
+  const videoRef = useRef(null);
+
+  /* RESET PER VIDEO */
+  useEffect(() => {
+    setIsFollowing(false);
+    setIsLiked(false);
+    setLikes(300);
+    setShowHeartAnim(false);
+    setFocus(null);
+  }, [currentIndex]);
+
+  /* KEY HANDLING */
+  useEffect(() => {
+    const handleKey = (e) => {
+      switch (e.key) {
+        case "ArrowLeft":
+          setFocus("leftArrow");
+          break;
+        case "ArrowRight":
+          setFocus("rightArrow");
+          break;
+        case "ArrowUp":
+          setFocus("follow");
+          break;
+        case "ArrowDown":
+          setFocus("like");
+          break;
+
+        case "Enter":
+          if (focus === "leftArrow" && currentIndex > 0) {
+            videoRef.current?.pause();
+            setCurrentIndex((p) => p - 1);
+          }
+
+          if (focus === "rightArrow" && currentIndex < videos.length - 1) {
+            videoRef.current?.pause();
+            setCurrentIndex((p) => p + 1);
+          }
+
+          if (focus === "follow") {
+            setIsFollowing(true);
+          }
+
+          if (focus === "like") {
+            setIsLiked(true);
+            setLikes((l) => l + 1);
+            setShowHeartAnim(true);
+
+            setTimeout(() => {
+              setShowHeartAnim(false);
+            }, 700);
+          }
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [focus, currentIndex]);
+
+  const highlight = (name) =>
+    focus === name
+      ? {
+          border: "3px solid gold",
+          boxShadow: "0 0 12px gold",
+        }
+      : {};
+
+  return (
+    <div style={{ height: "100vh", display: "flex", overflow: "hidden" }}>
+      {/* LEFT COLUMN */}
+      <div style={{ width: "33.33%", margin: "8px", borderRadius: "12px", border: "1px solid #ccc" }} />
+
+      {/* CENTER COLUMN */}
+      <div
+        style={{
+          width: "33.33%",
+          margin: "8px",
+          borderRadius: "12px",
+          border: "1px solid #ccc",
+          position: "relative",
+        }}
+      >
+        {/* FOLLOW */}
+        <div style={{ position: "absolute", top: "12px", left: "12px", zIndex: 3 }}>
+          <button
+            style={{
+              padding: "6px 14px",
+              borderRadius: "14px",
+              background: isFollowing ? "#4caf50" : "#fff",
+              ...highlight("follow"),
+            }}
+          >
+            {isFollowing ? "Following" : "Follow"}
+          </button>
+        </div>
+
+        {/* LEFT ARROW */}
+        <div
+          style={{
+            position: "absolute",
+            left: "10px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            fontSize: "28px",
+            ...highlight("leftArrow"),
+          }}
+        >
+          ◀
+        </div>
+
+        {/* RIGHT ARROW */}
+        <div
+          style={{
+            position: "absolute",
+            right: "10px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            fontSize: "28px",
+            ...highlight("rightArrow"),
+          }}
+        >
+          ▶
+        </div>
+
+        {/* VIDEO */}
+        <video
+          ref={videoRef}
+          key={currentIndex}
+          src={videos[currentIndex]}
+          autoPlay
+          muted
+          preload="metadata"
+          controls={false}
+          style={{ width: "100%", height: "100%", borderRadius: "12px" }}
+        />
+
+        {/* BIG HEART ANIMATION */}
+        {showHeartAnim && (
+          <div
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%) scale(1.8)",
+              fontSize: "80px",
+              color: "red",
+              opacity: showHeartAnim ? 1 : 0,
+              animation: "fadeHeart 0.7s ease-out",
+              pointerEvents: "none",
+            }}
+          >
+            ❤️
+          </div>
+        )}
+
+        {/* LIKE BUTTON + COUNT */}
+        <div
+          style={{
+            position: "absolute",
+            right: "16px",
+            bottom: "80px",
+            textAlign: "center",
+            ...highlight("like"),
+          }}
+        >
+          <div style={{ fontSize: "26px", color: isLiked ? "red" : "black" }}>
+            ❤️
+          </div>
+          <div style={{ fontSize: "14px" }}>{likes}</div>
+        </div>
+      </div>
+
+      {/* RIGHT COLUMN */}
+      <div style={{ width: "33.33%", margin: "8px", borderRadius: "12px", border: "1px solid #ccc" }}>
+        {isFollowing && <div style={{ padding: "8px" }}>✅ Following</div>}
+      </div>
+
+      {/* HEART ANIMATION KEYFRAMES */}
+      <style>
+        {`
+          @keyframes fadeHeart {
+            0% {
+              opacity: 1;
+              transform: translate(-50%, -50%) scale(1);
+            }
+            100% {
+              opacity: 0;
+              transform: translate(-50%, -70%) scale(2.5);
+            }
+          }
+        `}
+      </style>
+    </div>
+  );
+}

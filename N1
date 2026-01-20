@@ -1,0 +1,142 @@
+// network-hook.js
+<script>
+(function () {
+
+    function sendNetworkLog(data) {
+        if (window.__DEBUG_SOCKET__ && window.__DEBUG_SOCKET__.readyState === 1) {
+            window.__DEBUG_SOCKET__.send(JSON.stringify({
+                type: "network",
+                payload: data
+            }));
+        }
+    }
+
+    /* -------- FETCH -------- */
+    if (window.fetch) {
+        var _fetch = window.fetch;
+        window.fetch = function () {
+            var start = new Date().getTime();
+            var method = "GET";
+            var url = arguments[0];
+
+            if (arguments[1] && arguments[1].method) {
+                method = arguments[1].method;
+            }
+
+            return _fetch.apply(this, arguments).then(function (res) {
+                var clone = res.clone();
+                clone.text().then(function (txt) {
+                    sendNetworkLog({
+                        api: "fetch",
+                        method: method,
+                        url: url,
+                        status: res.status,
+                        time: new Date().getTime() - start,
+                        size: txt.length
+                    });
+                });
+                return res;
+            });
+        };
+    }
+
+    /* -------- XHR -------- */
+    var OldXHR = window.XMLHttpRequest;
+
+    function NewXHR() {
+        var xhr = new OldXHR();
+        var start, url, method;
+
+        xhr.open = function (m, u) {
+            method = m;
+            url = u;
+            OldXHR.prototype.open.apply(xhr, arguments);
+        };
+
+        xhr.send = function () {
+            start = new Date().getTime();
+            xhr.addEventListener("loadend", function () {
+                sendNetworkLog({
+                    api: "xhr",
+                    method: method,
+                    url: url,
+                    status: xhr.status,
+                    time: new Date().getTime() - start,
+                    size: xhr.responseText ? xhr.responseText.length : 0
+                });
+            });
+            OldXHR.prototype.send.apply(xhr, arguments);
+        };
+
+        return xhr;
+    }
+
+    window.XMLHttpRequest = NewXHR;
+
+})();
+</script>
+
+
+
+
+
+-------------
+// index.html
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Network Tab</title>
+<style>
+body { background:#0f172a; color:#e5e7eb; font-family:Arial; }
+table { width:100%; border-collapse:collapse; font-size:12px; }
+th,td { padding:6px; border-bottom:1px solid #1f2933; }
+th { background:#020617; position:sticky; top:0; }
+.ok { color:#22c55e; }
+.fail { color:#ef4444; }
+</style>
+</head>
+<body>
+
+<h3>Network</h3>
+
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Method</th>
+<th>URL</th>
+<th>Status</th>
+<th>Time</th>
+<th>Size</th>
+</tr>
+</thead>
+<tbody id="net"></tbody>
+</table>
+
+<script>
+var tbody = document.getElementById("net");
+
+var socket = new WebSocket("ws://localhost:PORT"); // same as existing
+
+socket.onmessage = function (e) {
+    var msg = JSON.parse(e.data);
+    if (msg.type !== "network") return;
+
+    var d = msg.payload;
+    var tr = document.createElement("tr");
+
+    tr.innerHTML =
+        "<td>" + d.api + "</td>" +
+        "<td>" + d.method + "</td>" +
+        "<td>" + d.url + "</td>" +
+        "<td class='" + (d.status < 400 ? "ok" : "fail") + "'>" + d.status + "</td>" +
+        "<td>" + d.time + " ms</td>" +
+        "<td>" + d.size + "</td>";
+
+    tbody.appendChild(tr);
+};
+</script>
+
+</body>
+</html>

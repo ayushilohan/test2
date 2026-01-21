@@ -1,0 +1,51 @@
+(function () {
+
+    function send(data) {
+        try {
+            window.__DEBUG_SOCKET__.send(JSON.stringify(data));
+        } catch (e) {
+            console.log("NETWORK SEND FAIL");
+        }
+    }
+
+    /* ---- XHR ONLY (fetch REMOVED for certainty) ---- */
+    var OldXHR = window.XMLHttpRequest;
+
+    window.XMLHttpRequest = function () {
+        var xhr = new OldXHR();
+        var method = "";
+        var url = "";
+        var start = 0;
+
+        var oldOpen = xhr.open;
+        xhr.open = function (m, u) {
+            method = m;
+            url = u;
+            oldOpen.apply(xhr, arguments);
+        };
+
+        var oldSend = xhr.send;
+        xhr.send = function () {
+            start = new Date().getTime();
+            oldSend.apply(xhr, arguments);
+        };
+
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                send({
+                    type: "network",
+                    payload: {
+                        method: method,
+                        url: url,
+                        status: xhr.status,
+                        time: new Date().getTime() - start,
+                        size: xhr.responseText ? xhr.responseText.length : 0
+                    }
+                });
+            }
+        };
+
+        return xhr;
+    };
+
+})();

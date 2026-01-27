@@ -1,0 +1,164 @@
+// ScrollAnimation.jsx
+import { useEffect } from "react";
+import "./ScrollAnimation.css";
+import img from "./image.png";
+
+export default function ScrollAnimation() {
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
+      const progress = Math.min(scrollY / vh, 1);
+
+      const left = document.querySelector(".left");
+      const right = document.querySelector(".right");
+      const bannerImg = document.querySelector(".banner-img");
+      const c1 = document.querySelector(".c1");
+      const c2 = document.querySelector(".c2");
+
+      if (!left || !right) return;
+
+      /* LEFT */
+      left.style.transform = `
+        translateX(${-progress * 200}px)
+        rotate(${-progress * 15}deg)
+      `;
+      left.style.opacity = 1 - progress;
+
+      /* RIGHT */
+      right.style.transform = `
+        translateX(${progress * 200}px)
+        rotate(${progress * 15}deg)
+      `;
+      right.style.opacity = 1 - progress;
+
+      /* Banner image rotate */
+      bannerImg.style.transform = `rotate(${progress * 90}deg)`;
+
+      /* Shapes motion */
+      c1.style.transform = `
+        translate(${Math.sin(scrollY * 0.01) * 40}px,
+                  ${Math.cos(scrollY * 0.01) * 40}px)
+      `;
+
+      c2.style.transform = `
+        translate(${Math.cos(scrollY * 0.01) * 40}px,
+                  ${Math.sin(scrollY * 0.01) * 40}px)
+      `;
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <>
+      {/* Background Shapes */}
+      <div className="shapes">
+        <span className="circle c1" />
+        <span className="circle c2" />
+      </div>
+
+      {/* Banner */}
+      <section className="banner">
+        <img src={img} alt="" className="banner-img" />
+        <h1>Scroll Animation Demo</h1>
+      </section>
+
+      {/* Content */}
+      <section className="scroll-section">
+        <div className="content left">
+          <img src={img} alt="" />
+        </div>
+
+        <div className="content right">
+          <p>
+            This is description text.  
+            Image and text animate outwards with fade & rotation.
+          </p>
+        </div>
+      </section>
+    </>
+  );
+}
+
+
+
+-------------------
+//ScrollAnimation.css
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0b0b0b;
+  color: white;
+  overflow-x: hidden;
+  font-family: sans-serif;
+}
+
+/* ---------- Banner ---------- */
+.banner {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-left: 80px;
+}
+
+.banner-img {
+  width: 80px;
+  transition: transform 0.3s ease;
+}
+
+.banner h1 {
+  font-size: 60px;
+}
+
+/* ---------- Section ---------- */
+.scroll-section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 100px;
+}
+
+.content {
+  width: 40%;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.content img {
+  width: 100%;
+}
+
+/* ---------- Shapes ---------- */
+.shapes {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.15;
+  background: linear-gradient(135deg, #ff7a18, #ffb347);
+}
+
+.c1 {
+  width: 250px;
+  height: 250px;
+  top: 20%;
+  left: 10%;
+}
+
+.c2 {
+  width: 180px;
+  height: 180px;
+  bottom: 15%;
+  right: 15%;
+}

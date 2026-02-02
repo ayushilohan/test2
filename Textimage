@@ -1,0 +1,141 @@
+import { useEffect, useRef } from "react";
+import "./ImageTextSection.css";
+
+export default function ImageTextSection({ image, text, reverse }) {
+  const imageRef = useRef(null);
+  const textRef = useRef(null);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (!imageRef.current || !textRef.current) return;
+
+      const rect = imageRef.current.getBoundingClientRect();
+      const vh = window.innerHeight;
+
+      const progress = Math.min(
+        Math.max((vh - rect.top) / vh, 0),
+        1
+      );
+
+      /* IMAGE */
+      imageRef.current.style.transform = `
+        translateX(${reverse ? progress * 220 : -progress * 220}px)
+        rotate(${reverse ? progress * 14 : -progress * 14}deg)
+      `;
+      imageRef.current.style.opacity = 1 - progress * 0.6;
+
+      /* TEXT */
+      textRef.current.style.transform = `
+        translateX(${reverse ? -progress * 220 : progress * 220}px)
+        rotate(${reverse ? -progress * 14 : progress * 14}deg)
+      `;
+      textRef.current.style.opacity = 1 - progress * 0.6;
+    };
+
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [reverse]);
+
+  return (
+    <section className="scroll-section">
+      {/* IMAGE */}
+      <div
+        className={`content image ${reverse ? "right" : "left"}`}
+        ref={imageRef}
+      >
+        <img src={image} alt="" />
+      </div>
+
+      {/* TEXT */}
+      <div
+        className={`content text ${reverse ? "left" : "right"}`}
+        ref={textRef}
+      >
+        <p>{text}</p>
+      </div>
+    </section>
+  );
+}
+
+
+
+---- csss
+.scroll-section {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 100px;
+  overflow: hidden;
+}
+
+.content {
+  width: 42%;
+  transition: transform 0.35s ease-out, opacity 0.35s ease-out;
+}
+
+.content img {
+  width: 100%;
+  border-radius: 20px;
+}
+
+.text p {
+  font-size: 18px;
+  line-height: 1.7;
+  white-space: pre-line; /* allows 5-line text */
+}
+
+.left {
+  text-align: left;
+}
+
+.right {
+  text-align: right;
+}
+
+
+----parent
+import ImageTextSection from "./ImageTextSection";
+import img1 from "../image/1.png";
+import img2 from "../image/2.png";
+import img3 from "../image/3.png";
+import img4 from "../image/4.png";
+import img5 from "../image/5.png";
+
+export default function Parent() {
+  const data = [
+    {
+      image: img1,
+      text: "Line one\nLine two\nLine three\nLine four\nLine five"
+    },
+    {
+      image: img2,
+      text: "Line one\nLine two\nLine three\nLine four\nLine five"
+    },
+    {
+      image: img3,
+      text: "Line one\nLine two\nLine three\nLine four\nLine five"
+    },
+    {
+      image: img4,
+      text: "Line one\nLine two\nLine three\nLine four\nLine five"
+    },
+    {
+      image: img5,
+      text: "Line one\nLine two\nLine three\nLine four\nLine five"
+    }
+  ];
+
+  return (
+    <>
+      {data.map((item, index) => (
+        <ImageTextSection
+          key={index}
+          image={item.image}
+          text={item.text}
+          reverse={index % 2 !== 0}
+        />
+      ))}
+    </>
+  );
+}

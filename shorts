@@ -1,0 +1,131 @@
+import React from 'react';
+import './Layout.css';
+
+const CardStackLayout = () => {
+  const images = [
+    { id: 1, color: '#f87171', label: '1' },
+    { id: 2, color: '#fbbf24', label: '2' },
+    { id: 3, color: '#34d399', label: '3' },
+  ];
+
+  return (
+    <div className="main-parent">
+      <div className="column-box">Left</div>
+      <div className="column-box">Middle</div>
+      
+      <div className="column-box right-column-wrapper">
+        <div className="right-top-box">Top Content</div>
+        
+        {/* The Card Container */}
+        <div className="right-bottom-box">
+          <div className="card-wrapper">
+            {images.map((card, index) => {
+              // Scale: 0.8, 0.9, 1.0 (Right-most is largest)
+              const scale = 0.8 + (index * 0.1);
+              // Position: Offset based on percentage to stay fluid
+              const leftOffset = index * 15; 
+
+              return (
+                <div
+                  key={card.id}
+                  className="stacked-card"
+                  style={{
+                    backgroundColor: card.color,
+                    left: `${leftOffset}%`,
+                    transform: `scale(${scale})`,
+                    zIndex: index,
+                  }}
+                >
+                  <span className="card-label">{card.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CardStackLayout;
+
+
+
+
+----------css-----------
+.main-parent {
+  display: flex;
+  width: 100%;
+  height: 80vh; /* Relative to viewport height */
+  gap: 1rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.column-box {
+  flex: 1; /* All 3 take equal width */
+  min-width: 0; /* Prevents flex items from overflowing */
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.right-column-wrapper {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  gap: 1rem;
+}
+
+.right-top-box {
+  height: 25%;
+  width: 100%;
+  background: #f1f5f9;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.right-bottom-box {
+  flex: 1;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden; /* Ensures nothing spills out */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Card Wrapper uses percentages to stay responsive */
+.card-wrapper {
+  position: relative;
+  width: 70%; /* Takes up 70% of the parent's width */
+  height: 60%; /* Takes up 60% of the parent's height */
+  max-width: 200px; /* Optional: prevents it from getting too huge */
+}
+
+.stacked-card {
+  position: absolute;
+  width: 70%; /* Card width relative to the wrapper */
+  height: 100%;
+  border-radius: 12px;
+  border: 2px solid white;
+  box-shadow: -5px 5px 15px rgba(0,0,0,0.1);
+  
+  /* Scale and align to right */
+  transform-origin: center right;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-label {
+  font-weight: bold;
+  color: white;
+}

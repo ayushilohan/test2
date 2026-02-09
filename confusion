@@ -1,0 +1,90 @@
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+
+const RobotEyes = () => {
+  const [isConfused, setIsConfused] = useState(false);
+
+  useEffect(() => {
+    // This starts the "confusion" loop
+    const toggleConfusion = () => {
+      setIsConfused(true);
+      
+      // Keep them confused for 5 seconds, then reset
+      setTimeout(() => {
+        setIsConfused(false);
+      }, 5000);
+    };
+
+    // Trigger immediately on load, then repeat every 8 seconds 
+    // (5s confused + 3s neutral rest)
+    toggleConfusion();
+    const interval = setInterval(toggleConfusion, 8000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const eyeVariants = {
+    neutral: {
+      scaleY: 1,
+      rotate: 0,
+      borderRadius: "30%",
+    },
+    // Left eye stays mostly square but softens slightly
+    confusedLeft: {
+      scaleY: 0.95,
+      rotate: -2,
+      borderRadius: "35% 35% 30% 30%",
+    },
+    // Right eye performs the specific tilt and shape from your image
+    confusedRight: {
+      scaleY: 0.8,
+      rotate: 12,
+      borderRadius: "45% 15% 45% 15%", // Creates that "diagonal" squint
+    }
+  };
+
+  return (
+    <div style={styles.container}>
+      <div style={styles.eyeContainer}>
+        {/* Left Eye */}
+        <motion.div
+          animate={isConfused ? "confusedLeft" : "neutral"}
+          variants={eyeVariants}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+          style={styles.eye}
+        />
+        
+        {/* Right Eye (The Confused One) */}
+        <motion.div
+          animate={isConfused ? "confusedRight" : "neutral"}
+          variants={eyeVariants}
+          transition={{ type: "spring", stiffness: 100, damping: 15 }}
+          style={styles.eye}
+        />
+      </div>
+    </div>
+  );
+};
+
+const styles = {
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    backgroundColor: '#000',
+  },
+  eyeContainer: {
+    display: 'flex',
+    gap: '50px',
+  },
+  eye: {
+    width: '130px',
+    height: '110px',
+    backgroundColor: '#67e8f9',
+    boxShadow: '0 0 30px rgba(103, 232, 249, 0.4)',
+    border: '2px solid rgba(255, 255, 255, 0.1)', // Subtle depth
+  }
+};
+
+export default RobotEyes;

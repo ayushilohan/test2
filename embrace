@@ -1,0 +1,150 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const EmoFace = () => {
+  const [emotion, setEmotion] = useState('idle');
+  const [isBlinking, setIsBlinking] = useState(false);
+  const [showControls, setShowControls] = useState(true);
+
+  // Keyboard toggle for controls
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key.toLowerCase() === 'h') setShowControls(prev => !prev);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Blink logic (Disabled for text/sleep/loading)
+  useEffect(() => {
+    if (['hello', 'sleep', 'loading'].includes(emotion)) return;
+    const blinkInterval = setInterval(() => {
+      setIsBlinking(true);
+      setTimeout(() => setIsBlinking(false), 100);
+    }, 4500);
+    return () => clearInterval(blinkInterval);
+  }, [emotion]);
+
+  const aquaColor = '#00FFFF';
+  const glow = '0 0 35px rgba(0, 255, 255, 0.7)';
+  const baseH = "min(150px, 20vw)";
+  const baseW = "min(130px, 18vw)";
+
+  const variants = {
+    idle: { height: baseH, width: baseW, borderRadius: "25%", rotate: 0, scale: 1, opacity: 1 },
+    happy: { height: "min(100px, 14vw)", width: baseW, borderRadius: "50% 50% 15% 15%", rotate: 0, scale: 1, opacity: 1 },
+    angry: { height: baseH, width: baseW, borderRadius: "15% 15% 50% 50%", rotate: 15, scale: 1, opacity: 1 },
+    sad: { height: baseH, width: baseW, borderRadius: "50% 50% 15% 15%", rotate: -12, scale: 1, opacity: 0.8 },
+    surprised: { height: baseH, width: baseH, borderRadius: "50%", rotate: 0, scale: 1.1, opacity: 1 },
+    thinking: { height: "min(120px, 16vw)", width: baseW, borderRadius: "30%", rotate: -10, scale: 0.9, opacity: 1 },
+    loading: { height: "min(40px, 6vw)", width: "min(40px, 6vw)", borderRadius: "50%", rotate: 360, transition: { repeat: Infinity, duration: 1 } },
+    sleep: { height: "4px", width: baseW, borderRadius: "2px", rotate: 0, scale: 1, opacity: 0.4 },
+    hello: { scale: 0, opacity: 0, transition: { duration: 0.2 } },
+    blink: { height: "2px", scaleY: 0 }
+  };
+
+  return (
+    <div style={{ 
+      backgroundColor: 'black', 
+      minHeight: '100vh', 
+      width: '100vw', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      position: 'fixed', 
+      top: 0, left: 0,
+      fontFamily: 'sans-serif' 
+    }}>
+      
+      {/* Speech Bubble (Rendered in center of screen) */}
+      <AnimatePresence>
+        {emotion === 'hello' && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.3, y: 50 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.3, y: 50 }}
+            style={{
+              position: 'absolute',
+              zIndex: 50,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}
+          >
+            <div style={{
+              backgroundColor: aquaColor,
+              color: 'black',
+              padding: '25px 50px',
+              borderRadius: '60px',
+              fontSize: 'clamp(40px, 10vw, 80px)',
+              fontWeight: '900',
+              boxShadow: glow,
+              position: 'relative',
+              whiteSpace: 'nowrap'
+            }}>
+              HELLO!
+              {/* Tail pointing down */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-18px',
+                left: '50%',
+                marginLeft: '-20px',
+                width: 0, height: 0,
+                borderLeft: '20px solid transparent',
+                borderRight: '20px solid transparent',
+                borderTop: `20px solid ${aquaColor}`
+              }} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Eyes Container */}
+      <div style={{ display: 'flex', gap: 'min(60px, 8vw)', alignItems: 'center' }}>
+        <motion.div
+          animate={isBlinking && emotion !== 'hello' ? "blink" : emotion}
+          variants={variants}
+          transition={{ type: "spring", stiffness: 250, damping: 20 }}
+          style={{ backgroundColor: aquaColor, boxShadow: glow }}
+        />
+        <motion.div
+          animate={isBlinking && emotion !== 'hello' ? "blink" : emotion}
+          variants={{
+            ...variants,
+            angry: { ...variants.angry, rotate: -15 },
+            sad: { ...variants.sad, rotate: 12 },
+            thinking: { ...variants.thinking, rotate: 10, y: 0 }
+          }}
+          transition={{ type: "spring", stiffness: 250, damping: 20 }}
+          style={{ backgroundColor: aquaColor, boxShadow: glow }}
+        />
+      </div>
+
+      {/* Controller Buttons (At the very bottom) */}
+      {showControls && (
+        <div style={{ 
+          position: 'absolute', bottom: '15px', 
+          display: 'flex', flexWrap: 'wrap', gap: '6px', 
+          justifyContent: 'center', opacity: 0.6 
+        }}>
+          {['idle', 'happy', 'angry', 'sad', 'surprised', 'thinking', 'loading', 'sleep', 'hello'].map((state) => (
+            <button
+              key={state}
+              onClick={() => setEmotion(state)}
+              style={{
+                padding: '6px 10px', fontSize: '10px',
+                backgroundColor: emotion === state ? aquaColor : 'rgba(255,255,255,0.1)',
+                color: emotion === state ? 'black' : 'white',
+                border: 'none', cursor: 'pointer', borderRadius: '4px', textTransform: 'uppercase'
+              }}
+            >
+              {state}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default EmoFace;

@@ -1,0 +1,28 @@
+I am working on a LiDAR-based signage application using a sensor.
+
+I can configure the sensor using commands to define corner coordinates (FOICORNER). These coordinates represent the X and Y axes that form a rectangular detection area.
+
+There are three main requirements:
+
+1. Define the detection area:
+   - Use FOICORNER commands to set four corner points (X, Y).
+   - These points form a rectangular boundary in which the sensor will track objects.
+
+2. Detection behavior:
+   - If a person or object enters this defined corner area, a message should be displayed on the screen.
+
+3. Zone inside the corner:
+   - Inside this larger corner area, define a smaller zone (e.g., Zone1).
+   - The system should specifically detect entry/exit events within this zone.
+   - Only when an object enters this zone, trigger a specific action (like displaying a message or logging an event).
+
+Additional details:
+- The sensor sends raw data (character stream) which needs to be decoded.
+- The implementation should be in JavaScript (ES5 compatible).
+- Commands are sent via serial communication.
+
+Provide:
+- Sample code to set FOICORNER coordinates
+- Code to define a zone inside the corner
+- Logic to detect when an object enters the zone
+- Example of parsing incoming sensor data and triggering UI action

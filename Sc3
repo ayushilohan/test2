@@ -1,0 +1,77 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+import urllib3
+import os
+
+# Suppress SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def scrape_hljs_by_h2(url):
+    try:
+        # Request with SSL verification disabled
+        res = requests.get(url, timeout=15, verify=False)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+
+        results = []
+        headers = soup.find_all('h2')
+
+        for h2 in headers:
+            topic_name = h2.get_text(strip=True)
+            code_snippets = []
+            
+            # Traverse siblings until the next h2
+            current_node = h2.find_next_sibling()
+            while current_node and current_node.name != 'h2':
+                # Search for any element with the 'hljs' class
+                # This handles <code> tags or <span> tags inside <pre>
+                hljs_elements = current_node.find_all(class_='hljs')
+                
+                # If the element itself has the class
+                if 'hljs' in current_node.get('class', []):
+                    hljs_elements.append(current_node)
+
+                for code in hljs_elements:
+                    text = code.get_text().strip()
+                    if text and text not in code_snippets:
+                        code_snippets.append(text)
+                
+                current_node = current_node.find_next_sibling()
+            
+            # Only save if snippets were found for this h2
+            if code_snippets:
+                results.append({
+                    "topic": topic_name,
+                    "snippets": code_snippets
+                })
+        
+        return results
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return None
+
+def main():
+    target_url = input("Enter the Tizen URL: ").strip()
+    
+    # Extract a filename from the URL path
+    path_parts = [p for p in target_url.split('/') if p]
+    filename_base = path_parts[-1].replace('.html', '') if path_parts else "data"
+    
+    print(f"🔍 Searching for <h2> and .hljs code in: {target_url}...")
+    
+    data = scrape_hljs_by_h2(target_url)
+    
+    if data:
+        filename = f"{filename_base}.json"
+        # Save directly to root directory
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        
+        print(f"✅ Success! Created '{filename}' in the root folder.")
+    else:
+        print("Done. No code blocks with class 'hljs' were found under <h2> tags.")
+
+if __name__ == "__main__":
+    main()

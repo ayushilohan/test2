@@ -1,0 +1,80 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+import urllib3
+import os
+
+# Suppress SSL warnings for certificate issues
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def scrape_topics_from_url(url):
+    try:
+        # Bypassing SSL with verify=False
+        res = requests.get(url, timeout=15, verify=False)
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, 'html.parser')
+
+        results = []
+        
+        # Find all h2 tags
+        headers = soup.find_all('h2')
+        
+        if not headers:
+            print("No h2 tags found on this page.")
+            return None
+
+        for h2 in headers:
+            topic_name = h2.get_text(strip=True)
+            code_snippets = []
+            
+            # Look at all elements following the h2 until the next h2
+            current_node = h2.find_next_sibling()
+            while current_node and current_node.name != 'h2':
+                # Check if this element is a code block or contains code
+                if current_node.name in ['pre', 'code']:
+                    code_snippets.append(current_node.get_text().strip())
+                else:
+                    # Also search inside the element for nested code tags
+                    nested_code = current_node.find_all(['pre', 'code'])
+                    for code in nested_code:
+                        text = code.get_text().strip()
+                        if text and text not in code_snippets:
+                            code_snippets.append(text)
+                
+                current_node = current_node.find_next_sibling()
+            
+            # Only add to JSON if code was actually found under this heading
+            if code_snippets:
+                results.append({
+                    "topic": topic_name,
+                    "code_count": len(code_snippets),
+                    "snippets": code_snippets
+                })
+        
+        return results
+
+    except Exception as e:
+        print(f"❌ Error scraping URL: {e}")
+        return None
+
+def main():
+    target_url = input("Enter the Tizen URL: ").strip()
+    # Use a generic name if the user doesn't provide one, or extract from URL
+    feature_label = target_url.split('/')[-2] if '/' in target_url else "scraped_data"
+    
+    print(f"🔍 Searching for <h2> headings and code in: {target_url}...")
+    
+    data = scrape_topics_from_url(target_url)
+    
+    if data:
+        filename = f"{feature_label}.json"
+        # Save to root directory
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=4, ensure_ascii=False)
+        
+        print(f"✅ Success! Created '{filename}' with {len(data)} topics.")
+    else:
+        print("Done. No JSON was created because no code blocks were found under h2 tags.")
+
+if __name__ == "__main__":
+    main()

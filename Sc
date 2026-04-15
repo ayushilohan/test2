@@ -1,0 +1,59 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+import os
+import time
+
+def scrape_feature(url):
+    """Scrapes the content of a single page."""
+    try:
+        res = requests.get(url, timeout=10)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        
+        # Standard Tizen Doc Selectors
+        title = soup.find('h1').get_text(strip=True) if soup.find('h1') else "No Title"
+        # We target the 'body' of the documentation
+        content_div = soup.find('div', id='content') or soup.find('article')
+        body = content_div.get_text(separator="\n", strip=True) if content_div else ""
+        
+        return {"title": title, "url": url, "content": body}
+    except Exception as e:
+        print(f"  ! Error on {url}: {e}")
+        return None
+
+def main():
+    # 1. Ask where to save the files
+    folder_path = input("Enter the directory path to save JSON files (e.g., ./tizen_data): ")
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+        print(f"Created directory: {folder_path}")
+
+    while True:
+        # 2. Input the feature details
+        print("\n--- New Feature Scraping Task ---")
+        feature_name = input("Enter feature name (e.g., bluetooth) or 'q' to quit: ").strip().lower()
+        if feature_name == 'q':
+            break
+            
+        start_url = input(f"Enter the Tizen URL for {feature_name}: ").strip()
+        
+        print(f"Scraping {feature_name}...")
+        
+        # For simplicity, this scrapes the single page provided. 
+        # (You can integrate the link-crawling logic from the previous step here if needed)
+        data = scrape_feature(start_url)
+        
+        if data:
+            # 3. Create the JSON file
+            file_name = f"{feature_name}.json"
+            full_path = os.path.join(folder_path, file_name)
+            
+            with open(full_path, 'w', encoding='utf-8') as f:
+                json.dump([data], f, indent=4, ensure_ascii=False)
+            
+            print(f"Successfully created: {full_path}")
+        else:
+            print("Failed to capture data. Check the URL and try again.")
+
+if __name__ == "__main__":
+    main()

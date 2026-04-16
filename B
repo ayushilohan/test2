@@ -1,0 +1,63 @@
+from bs4 import BeautifulSoup
+import json
+
+html_content = """
+<table class="informaltable">
+    <thead>
+        <tr><th>Interface</th><th>Method</th></tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>User Authentication</td>
+            <td>
+                <div>
+                    <a href="/login">Login Method<p>Handles user sign-in</p></a>
+                    <a href="/logout">Logout Method<p>Ends the session</p></a>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>Data Fetching</td>
+            <td>
+                <div>
+                    <a href="/get">Get Data<p>Retrieves records</p></a>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+"""
+
+soup = BeautifulSoup(html_content, 'html.parser')
+results = {}
+
+# Target the specific table class
+table = soup.find('table', class_='informaltable')
+rows = table.find('tbody').find_all('tr') if table.find('tbody') else table.find_all('tr')[1:]
+
+for row in rows:
+    cols = row.find_all('td')
+    if len(cols) < 2:
+        continue
+        
+    # First TD is the heading (Key)
+    heading = cols[0].get_text(strip=True)
+    
+    # Second TD contains the <a> tags (Values)
+    methods = []
+    links = cols[1].find_all('a')
+    
+    for link in links:
+        method_name = link.get_text(strip=True)
+        # Specifically extracting the <p> tag content within the <a> tag
+        description = link.find('p').get_text(strip=True) if link.find('p') else ""
+        
+        methods.append({
+            "method": method_name,
+            "description": description
+        })
+    
+    results[heading] = methods
+
+# Output the final JSON
+print(json.dumps(results, indent=4))

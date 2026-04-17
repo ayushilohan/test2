@@ -1,0 +1,65 @@
+import requests
+from bs4 import BeautifulSoup
+import json
+import urllib3
+
+# Suppress only the single InsecureRequestWarning from urllib3 needed for verify=False
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+def scrape_to_json():
+    # Prompting the user for the URL
+    url = input("Please enter the URL: ")
+
+    try:
+        # verify=False handles SSL/Certification errors
+        # timeout ensures the script doesn't hang indefinitely
+        response = requests.get(url, verify=False, timeout=20)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # Find the first table available on the page
+        table = soup.find('table')
+        
+        if not table:
+            print("No table found at the provided URL.")
+            return
+
+        data = []
+        rows = table.find_all('tr')
+        
+        if not rows:
+            print("Table is empty.")
+            return
+
+        # Extract headers from the first row
+        headers = [header.get_text(strip=True) for header in rows[0].find_all(['th', 'td'])]
+        
+        # Extract data from subsequent rows
+        for row in rows[1:]:
+            cols = row.find_all(['td', 'th'])
+            cols_text = [col.get_text(strip=True) for col in cols]
+            
+            # Ensure row length matches header length to avoid mapping errors
+            if len(cols_text) == len(headers):
+                row_dict = dict(zip(headers, cols_text))
+                data.append(row_dict)
+
+        # Convert to JSON format
+        output_json = json.dumps(data, indent=4)
+        
+        print("\nExtracted JSON Data:")
+        print(output_json)
+        
+        # Saving to a file
+        with open('extracted_data.json', 'w') as f:
+            f.write(output_json)
+            print("\nSuccess! Data saved to 'extracted_data.json'.")
+
+    except requests.exceptions.SSLError as ssl_err:
+        print(f"SSL Certification Error: {ssl_err}")
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while fetching the URL: {e}")
+
+if __name__ == "__main__":
+    scrape_to_json()

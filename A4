@@ -1,0 +1,59 @@
+Connecting the MDC Cable
+
+1. Connect the RS232 cable (or RJ45-to-Serial cable depending on model) between the PC/controller and the Samsung ePaper display.
+2. If using TCP/IP MDC:
+    * Connect both the display and controller system to the same network.
+    * Enable MDC over Network from the display settings.
+3. Configure communication settings:
+    * Baud Rate: 9600
+    * Data Bits: 8
+    * Parity: None
+    * Stop Bit: 1
+
+⸻
+
+Generic MDC Command Syntax
+
+MDC commands follow this packet structure:
+
+[Header][Command][Display ID][Data Length][Data][Checksum]
+
+Field Description
+
+Field	Description
+Header	Fixed value 0xAA
+Command	MDC command code
+Display ID	Target display ID
+Data Length	Length of data bytes
+Data	Command parameters
+Checksum	Sum of all bytes except Header (0xFF masked)
+
+⸻
+
+Generic Command Format
+
+AA <Command> <ID> <Length> <Data> <Checksum>
+
+Example — Power ON
+
+AA 11 01 01 01 14
+
+Byte	Meaning
+AA	Header
+11	Power command
+01	Display ID
+01	Data length
+01	Power ON
+14	Checksum
+
+⸻
+
+Checksum Formula
+
+Checksum = (Command + ID + Length + Data bytes) & 0xFF
+
+Example:
+
+11 + 01 + 01 + 01 = 14
+
+Hence checksum = 0x14.

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Nested External Iframe Test</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #000;
+            color: white;
+            font-family: Arial;
+            overflow: hidden;
+        }
+
+        h2 {
+            padding: 10px;
+        }
+
+        iframe {
+            border: 2px solid white;
+        }
+
+        #parentFrame {
+            width: 95vw;
+            height: 85vh;
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>Main Tizen App</h2>
+
+<iframe
+    id="parentFrame"
+    srcdoc='
+        <!DOCTYPE html>
+        <html>
+        <body style="margin:0;background:#111;color:white;font-family:Arial;">
+
+            <h3>Parent Iframe</h3>
+
+            <iframe
+                width="95%"
+                height="300"
+                style="border:2px solid red;"
+                src="https://example.com">
+            </iframe>
+
+            <br><br>
+
+            <iframe
+                width="95%"
+                height="300"
+                style="border:2px solid cyan;"
+                src="https://www.wikipedia.org">
+            </iframe>
+
+        </body>
+        </html>
+    '>
+</iframe>
+
+</body>
+</html>

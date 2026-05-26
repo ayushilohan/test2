@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<style>
+    body {
+        margin: 0;
+        background: black;
+        color: white;
+        font-family: Arial;
+    }
+
+    iframe {
+        border: 2px solid white;
+    }
+
+    #outer {
+        width: 95vw;
+        height: 90vh;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Main App</h2>
+
+<iframe id="outer"
+srcdoc='
+
+<html>
+
+<body style="background:#222;color:white;font-family:Arial;">
+
+<h3>Level 1</h3>
+
+<iframe
+    width="90%"
+    height="500"
+    srcdoc="
+
+    <html>
+
+    <body style=&quot;background:#333;color:yellow;font-family:Arial;&quot;>
+
+    <h3>Level 2</h3>
+
+    <iframe
+        width=&quot;90%&quot;
+        height=&quot;350&quot;
+        srcdoc=&quot;
+
+        <html>
+
+        <body style='background:#444;color:cyan;font-family:Arial;'>
+
+        <h3>Level 3</h3>
+
+        <iframe
+            width='90%'
+            height='250'
+            src='https://www.w3schools.com'>
+        </iframe>
+
+        </body>
+
+        </html>
+
+        &quot;>
+    </iframe>
+
+    </body>
+
+    </html>
+
+    ">
+</iframe>
+
+</body>
+
+</html>
+
+'>
+</iframe>
+
+</body>
+</html>
